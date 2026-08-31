@@ -1,0 +1,866 @@
+/* =========================================================
+   COSTURAPP - DETALLE DE PEDIDO
+========================================================= */
+
+.order-detail-page {
+    width: 100%;
+    max-width: 1250px;
+    margin: 0 auto;
+
+    color: var(--text);
+}
+
+/* =========================================================
+   BARRA SUPERIOR
+========================================================= */
+
+.detail-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 22px;
+}
+
+.detail-back-button,
+.detail-edit-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 43px;
+
+    padding: 10px 16px;
+
+    border-radius: 11px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.detail-back-button {
+    border: 1px solid var(--border);
+
+    background: white;
+
+    color: #5e5664;
+}
+
+.detail-back-button:hover {
+    background: #faf7f9;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(80, 50, 70, 0.07);
+}
+
+.detail-edit-button {
+    border: none;
+
+    background: var(--accent);
+
+    color: white;
+
+    box-shadow:
+        0 6px 16px rgba(183, 110, 145, 0.17);
+}
+
+.detail-edit-button:hover {
+    background: var(--accent-dark);
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 9px 20px rgba(183, 110, 145, 0.22);
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.detail-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    padding: 28px;
+
+    margin-bottom: 18px;
+
+    border: 1px solid var(--border);
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #fffafd 100%
+        );
+
+    box-shadow:
+        0 10px 28px rgba(80, 50, 70, 0.07);
+}
+
+.detail-hero-left {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+
+    gap: 17px;
+}
+
+.detail-hero-icon {
+    flex: 0 0 auto;
+
+    width: 68px;
+    height: 68px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background: var(--accent-bg);
+
+    font-size: 34px;
+}
+
+.detail-eyebrow {
+    margin-bottom: 5px;
+
+    color: var(--accent-dark);
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.7px;
+}
+
+.detail-hero h1 {
+    margin: 0;
+
+    color: #302a38;
+
+    font-size: clamp(24px, 2vw, 31px);
+
+    letter-spacing: -0.7px;
+}
+
+.detail-hero p {
+    margin: 6px 0 0;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+}
+
+.detail-hero-status {
+    flex-shrink: 0;
+
+    padding: 10px 15px;
+
+    border-radius: 999px;
+
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.detail-status-process {
+    background: #fff7d6;
+    color: #a16207;
+
+    border: 1px solid #f8e9aa;
+}
+
+.detail-status-ready {
+    background: #e9f9ee;
+    color: #15803d;
+
+    border: 1px solid #cef0d8;
+}
+
+.detail-status-delivered {
+    background: #f0f1f3;
+    color: #59606b;
+
+    border: 1px solid #e2e4e8;
+}
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+.detail-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 14px;
+
+    margin-bottom: 18px;
+}
+
+.detail-summary-card {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 17px;
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    background: white;
+
+    box-shadow:
+        0 6px 20px rgba(80, 50, 70, 0.045);
+}
+
+.detail-summary-icon {
+    width: 44px;
+    height: 44px;
+
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: var(--accent-bg);
+
+    font-size: 21px;
+}
+
+.detail-summary-card span,
+.detail-summary-card strong,
+.detail-summary-card small {
+    display: block;
+}
+
+.detail-summary-card span {
+    margin-bottom: 3px;
+
+    color: var(--text-light);
+
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.detail-summary-card strong {
+    color: #443d4c;
+
+    font-size: 14px;
+}
+
+.detail-summary-card small {
+    margin-top: 3px;
+
+    color: #9a939f;
+
+    font-size: 11px;
+}
+
+.detail-pending-text {
+    color: #c56f24 !important;
+}
+
+.detail-paid-text {
+    color: var(--green) !important;
+}
+
+/* =========================================================
+   CONTENIDO
+========================================================= */
+
+.detail-content-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.7fr)
+        minmax(270px, 0.8fr);
+
+    gap: 18px;
+}
+
+.detail-panel {
+    min-width: 0;
+
+    padding: 22px;
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    background: white;
+
+    box-shadow:
+        0 7px 25px rgba(80, 50, 70, 0.05);
+}
+
+.detail-panel-main {
+    min-width: 0;
+}
+
+.detail-side-column {
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+/* =========================================================
+   CABECERAS
+========================================================= */
+
+.detail-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+}
+
+.detail-panel-header h2,
+.detail-panel-header-simple h2 {
+    margin: 0;
+
+    color: #39333f;
+
+    font-size: 18px;
+}
+
+.detail-panel-header p {
+    margin: 4px 0 0;
+
+    color: var(--text-light);
+
+    font-size: 12px;
+}
+
+.detail-panel-header-simple {
+    margin-bottom: 17px;
+}
+
+.detail-count-badge {
+    flex-shrink: 0;
+
+    padding: 7px 11px;
+
+    border-radius: 999px;
+
+    background: var(--accent-bg);
+
+    color: var(--accent-dark);
+
+    font-size: 11px;
+    font-weight: 750;
+}
+
+/* =========================================================
+   PRENDAS
+========================================================= */
+
+.detail-garments {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.detail-garment-card {
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns:
+        26px
+        55px
+        minmax(0, 1fr);
+
+    gap: 13px;
+
+    padding: 16px;
+
+    border: 1px solid #eee7ec;
+
+    border-radius: 15px;
+
+    background: #fdfbfd;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.detail-garment-card:hover {
+    border-color: var(--accent-border);
+
+    background: #fffafd;
+
+    transform: translateY(-1px);
+}
+
+.detail-garment-number {
+    padding-top: 4px;
+
+    color: #aea6b2;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.detail-garment-icon {
+    width: 55px;
+    height: 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: var(--accent-bg);
+
+    font-size: 27px;
+}
+
+.detail-garment-body {
+    min-width: 0;
+}
+
+.detail-garment-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 12px;
+}
+
+.detail-garment-heading h3 {
+    margin: 0 0 4px;
+
+    color: #39333f;
+
+    font-size: 16px;
+}
+
+.detail-garment-heading span {
+    color: var(--text-light);
+
+    font-size: 11px;
+}
+
+.detail-garment-heading span strong {
+    color: var(--accent-dark);
+}
+
+.detail-garment-price {
+    flex-shrink: 0;
+
+    color: #494250;
+
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.detail-garment-description {
+    padding: 11px 12px;
+
+    border-radius: 11px;
+
+    background: #ffffff;
+
+    border: 1px solid #f0e9ee;
+}
+
+.detail-garment-description span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--text-light);
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.detail-garment-description p {
+    margin: 0;
+
+    color: #564e5d;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+/* =========================================================
+   PEDIDOS VIEJOS
+========================================================= */
+
+.detail-old-order {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 17px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    background: #fbf9fa;
+}
+
+.detail-old-order-icon {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: var(--accent-bg);
+
+    font-size: 25px;
+}
+
+.detail-old-order h3 {
+    margin: 0 0 4px;
+
+    color: var(--text);
+
+    font-size: 16px;
+}
+
+.detail-old-order p {
+    margin: 0;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+}
+
+/* =========================================================
+   ESTADO
+========================================================= */
+
+.detail-status-box {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    padding: 13px;
+
+    margin-bottom: 10px;
+
+    border-radius: 12px;
+
+    background: #fbf9fa;
+
+    border: 1px solid var(--border);
+}
+
+.detail-status-box:last-child {
+    margin-bottom: 0;
+}
+
+.detail-status-box span {
+    color: var(--text-light);
+
+    font-size: 11px;
+}
+
+.detail-status-box strong {
+    font-size: 14px;
+}
+
+.detail-priority-urgent {
+    color: var(--red);
+}
+
+.detail-priority-normal {
+    color: var(--green);
+}
+
+/* =========================================================
+   PAGO
+========================================================= */
+
+.detail-money-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 11px;
+}
+
+.detail-money-list > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+.detail-money-list span {
+    color: var(--text-light);
+
+    font-size: 12px;
+}
+
+.detail-money-list strong {
+    color: #4a4351;
+
+    font-size: 13px;
+}
+
+.detail-money-total {
+    padding-top: 12px;
+
+    border-top: 1px solid var(--border);
+}
+
+/* =========================================================
+   NOTAS
+========================================================= */
+
+.detail-panel-notes {
+    grid-column: 1 / -1;
+}
+
+.detail-notes-box {
+    min-height: 90px;
+
+    padding: 15px;
+
+    border-radius: 13px;
+
+    background: #fbf9fa;
+
+    border: 1px solid var(--border);
+}
+
+.detail-notes-box > p {
+    margin: 0;
+
+    color: #4f4856;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+.detail-no-notes {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.detail-no-notes > span {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #f2edf1;
+
+    font-size: 19px;
+}
+
+.detail-no-notes strong {
+    color: #57505d;
+
+    font-size: 13px;
+}
+
+.detail-no-notes p {
+    margin: 3px 0 0;
+
+    color: var(--text-light);
+
+    font-size: 12px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.detail-footer {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 18px;
+
+    padding-bottom: 30px;
+}
+
+/* =========================================================
+   VACÍO
+========================================================= */
+
+.detail-empty-card {
+    padding: 75px 30px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    background: white;
+
+    text-align: center;
+
+    box-shadow:
+        0 7px 25px rgba(80, 50, 70, 0.05);
+}
+
+.detail-empty-icon {
+    margin-bottom: 10px;
+
+    font-size: 58px;
+}
+
+.detail-empty-card h2 {
+    margin: 0 0 7px;
+
+    color: #39333f;
+}
+
+.detail-empty-card p {
+    margin: 0;
+
+    color: var(--text-light);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .detail-summary-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .detail-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-side-column {
+        display: grid;
+
+        grid-template-columns:
+            1fr
+            1fr;
+    }
+
+    .detail-panel-notes {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .detail-topbar,
+    .detail-hero,
+    .detail-footer {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    .detail-back-button,
+    .detail-edit-button {
+        width: 100%;
+    }
+
+    .detail-hero-left {
+        align-items: flex-start;
+    }
+
+    .detail-hero {
+        padding: 20px;
+    }
+
+    .detail-hero-icon {
+        width: 56px;
+        height: 56px;
+
+        border-radius: 16px;
+
+        font-size: 27px;
+    }
+
+    .detail-hero-status {
+        width: fit-content;
+    }
+
+    .detail-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-side-column {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-garment-card {
+        grid-template-columns:
+            48px
+            minmax(0, 1fr);
+    }
+
+    .detail-garment-number {
+        display: none;
+    }
+
+    .detail-garment-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .detail-garment-heading {
+        flex-direction: column;
+    }
+
+    .detail-garment-price {
+        align-self: flex-start;
+    }
+}

@@ -1,0 +1,918 @@
+
+/* =========================================
+   CALENDARIO - COSTURAPP
+========================================= */
+
+.calendar-page {
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff8f2;
+  color: #4a4a4a;
+  padding: 30px;
+  overflow-x: hidden;
+}
+
+.calendar-page *,
+.calendar-page *::before,
+.calendar-page *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 20px;
+  width: 100%;
+}
+
+.calendar-header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+}
+
+.calendar-back-button {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid #eadbc8;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #666;
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.calendar-back-button:hover {
+  background: #f8edf0;
+  color: #c8758e;
+}
+
+.calendar-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendar-title-icon {
+  font-size: 28px;
+}
+
+.calendar-header h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #4a4a4a;
+}
+
+.calendar-header p {
+  margin: 5px 0 0;
+  color: #999;
+  font-size: 14px;
+}
+
+.today-button {
+  flex-shrink: 0;
+  border: 1px solid #eadbc8;
+  background: #ffffff;
+  color: #c8758e;
+  padding: 11px 18px;
+  border-radius: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.today-button:hover {
+  background: #f8edf0;
+}
+
+/* =========================================
+   CONTENIDO
+========================================= */
+
+.calendar-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  width: 100%;
+  min-width: 0;
+}
+
+.calendar-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+/* =========================================
+   BARRA DEL MES
+========================================= */
+
+.month-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 20px;
+  min-width: 0;
+}
+
+.month-navigation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.month-navigation h2 {
+  min-width: 190px;
+  margin: 0;
+  text-align: center;
+  font-size: 21px;
+  color: #4a4a4a;
+}
+
+.month-arrow {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border: 1px solid #eadbc8;
+  background: #ffffff;
+  border-radius: 10px;
+  color: #666;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.month-arrow:hover {
+  background: #f8edf0;
+  color: #c8758e;
+}
+
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #888;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.calendar-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.neutral {
+  background: #d9d1cb;
+}
+
+.legend-dot.pending {
+  background: #e3b85b;
+}
+
+.legend-dot.urgent {
+  background: #d98282;
+}
+
+/* =========================================
+   TARJETA DEL CALENDARIO
+========================================= */
+
+.calendar-card {
+  width: 100%;
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #eadfd8;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+/* =========================================
+   DÍAS DE LA SEMANA
+========================================= */
+
+.week-header {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  width: 100%;
+  background: #faf6f3;
+  border-bottom: 1px solid #eadfd8;
+}
+
+.week-day {
+  min-width: 0;
+  padding: 13px 8px;
+  text-align: center;
+  color: #999;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* =========================================
+   GRILLA
+========================================= */
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  width: 100%;
+  min-width: 0;
+}
+
+/* =========================================
+   CELDA DEL DÍA
+========================================= */
+
+.calendar-day {
+  position: relative;
+  min-width: 0;
+  min-height: 125px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-right: 1px solid #eee5df;
+  border-bottom: 1px solid #eee5df;
+  background: #ffffff;
+  text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.calendar-day:nth-child(7n) {
+  border-right: none;
+}
+
+.calendar-day:hover:not(:disabled) {
+  background: #fff9f6;
+}
+
+.calendar-day.empty-day {
+  background: #fcfaf8;
+  cursor: default;
+}
+
+/* =========================================
+   NÚMERO DEL DÍA
+========================================= */
+
+.day-number {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  margin-bottom: 9px;
+  min-width: 0;
+  width: 100%;
+}
+
+.day-number > span {
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #555;
+}
+
+.day-number small {
+  flex-shrink: 0;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: #f5dce4;
+  color: #c8758e;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* =========================================
+   HOY
+========================================= */
+
+.calendar-day.today {
+  background: #fff8fa;
+}
+
+.calendar-day.today .day-number > span {
+  color: #c8758e;
+}
+
+/* =========================================
+   PEDIDOS DENTRO DEL DÍA
+========================================= */
+
+.day-orders {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* =========================================
+   MINI PEDIDO
+========================================= */
+
+.mini-order {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 7px;
+  border-radius: 7px;
+  background: #f8f3ef;
+  overflow: hidden;
+}
+
+.mini-order.urgent {
+  background: #fae9e9;
+}
+
+.mini-order-dot {
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d9a1b0;
+}
+
+.mini-order.urgent .mini-order-dot {
+  background: #d98282;
+}
+
+.mini-order-name {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  color: #666;
+}
+
+/* =========================================
+   MÁS PEDIDOS
+========================================= */
+
+.more-orders {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 3px 5px;
+  color: #c8758e;
+  font-size: 10px;
+  font-weight: 700;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* =========================================
+   SIN PEDIDOS
+========================================= */
+
+.empty-day-text {
+  display: block;
+  max-width: 100%;
+  color: #c5bdb7;
+  font-size: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* =========================================
+   CONTADOR
+========================================= */
+
+.order-count {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: #f5dce4;
+  color: #c8758e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.order-count.urgent {
+  background: #fae1e1;
+  color: #b85c5c;
+}
+
+/* =========================================
+   DÍA SELECCIONADO
+========================================= */
+
+.calendar-day.selected {
+  background: #fff4f7;
+  box-shadow: inset 0 0 0 2px #e3b2c0;
+}
+
+.calendar-day.has-urgent {
+  background: #fffafa;
+}
+
+/* =========================================
+   SIDEBAR DEL DÍA
+========================================= */
+
+.calendar-sidebar {
+  flex: 0 0 340px;
+  width: 340px;
+  min-width: 0;
+  max-width: 340px;
+  background: #ffffff;
+  border: 1px solid #eadfd8;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+/* =========================================
+   HEADER SIDEBAR
+========================================= */
+
+.sidebar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px;
+  border-bottom: 1px solid #eee5df;
+}
+
+.sidebar-header > div {
+  min-width: 0;
+}
+
+.sidebar-date-label {
+  display: block;
+  margin-bottom: 3px;
+  color: #c8758e;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #4a4a4a;
+}
+
+.close-sidebar {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border: none;
+  background: #f7f3f0;
+  border-radius: 9px;
+  color: #777;
+  font-size: 21px;
+  cursor: pointer;
+}
+
+.close-sidebar:hover {
+  background: #f5dce4;
+  color: #c8758e;
+}
+
+/* =========================================
+   CONTENIDO SIDEBAR
+========================================= */
+
+.sidebar-content {
+  width: 100%;
+  min-width: 0;
+  padding: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 145px);
+}
+
+/* =========================================
+   RESUMEN
+========================================= */
+
+.sidebar-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.sidebar-summary strong {
+  font-size: 25px;
+  color: #c8758e;
+}
+
+.sidebar-summary span {
+  color: #999;
+  font-size: 13px;
+}
+
+/* =========================================
+   PEDIDOS SIDEBAR
+========================================= */
+
+.sidebar-orders {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+/* =========================================
+   TARJETA DE PEDIDO
+========================================= */
+
+.calendar-sidebar .order-card {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 15px;
+  border: 1px solid #eee5df;
+  border-radius: 13px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.calendar-sidebar .order-card.urgent-card {
+  border-color: #efcccc;
+  background: #fffafa;
+}
+
+/* =========================================
+   PARTE SUPERIOR DE PEDIDO
+========================================= */
+
+.calendar-sidebar .order-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 8px;
+}
+
+.calendar-sidebar .order-type {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #c8758e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.urgent-badge {
+  flex: 0 0 auto;
+  padding: 4px 7px;
+  border-radius: 7px;
+  background: #fae1e1;
+  color: #b85c5c;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* =========================================
+   CLIENTE
+========================================= */
+
+.calendar-sidebar .order-card h4 {
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: #4a4a4a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================
+   DESCRIPCIÓN
+========================================= */
+
+.calendar-order-description {
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 10px;
+  color: #888;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* =========================================
+   ESTADO
+========================================= */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: #fff0cf;
+  color: #a47b2c;
+  font-size: 10px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-listo {
+  background: #e1f1df;
+  color: #63835e;
+}
+
+.status-entregado {
+  background: #eeeeee;
+  color: #777;
+}
+
+.status-en-proceso {
+  background: #fff0cf;
+  color: #a47b2c;
+}
+
+/* =========================================
+   FECHA DEL PEDIDO
+========================================= */
+
+.calendar-order-date {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #f0e9e4;
+}
+
+.calendar-order-date span {
+  flex-shrink: 0;
+  color: #999;
+  font-size: 11px;
+}
+
+.calendar-order-date strong {
+  min-width: 0;
+  max-width: 65%;
+  color: #666;
+  font-size: 11px;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================
+   BOTÓN EDITAR
+========================================= */
+
+.calendar-sidebar .edit-order-button {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 12px 0 0;
+  padding: 9px 10px;
+  border: 1px solid #eadbc8;
+  border-radius: 9px;
+  background: #faf7f4;
+  color: #666;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.calendar-sidebar .edit-order-button:hover {
+  background: #f5dce4;
+  border-color: #e3b2c0;
+  color: #c8758e;
+}
+
+/* =========================================
+   SIN PEDIDOS
+========================================= */
+
+.no-orders {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+.no-orders-icon {
+  font-size: 35px;
+  margin-bottom: 10px;
+}
+
+.no-orders h4 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.no-orders p {
+  margin: 0;
+  color: #999;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1100px) {
+  .calendar-content {
+    flex-direction: column;
+  }
+
+  .calendar-main {
+    width: 100%;
+  }
+
+  .calendar-sidebar {
+    width: 100%;
+    max-width: none;
+    flex: none;
+  }
+
+  .sidebar-content {
+    max-height: 500px;
+  }
+}
+
+/* =========================================
+   TABLET PEQUEÑA
+========================================= */
+
+@media (max-width: 800px) {
+  .calendar-page {
+    padding: 20px;
+  }
+
+  .month-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .calendar-legend {
+    width: 100%;
+  }
+
+  .calendar-day {
+    min-height: 105px;
+    padding: 7px;
+  }
+
+  .mini-order {
+    padding: 5px;
+  }
+
+  .mini-order-name {
+    font-size: 10px;
+  }
+}
+
+/* =========================================
+   CELULAR
+========================================= */
+
+@media (max-width: 600px) {
+  .calendar-page {
+    padding: 14px;
+  }
+
+  .calendar-header {
+    align-items: flex-start;
+  }
+
+  .calendar-header h1 {
+    font-size: 22px;
+  }
+
+  .calendar-header p {
+    font-size: 12px;
+  }
+
+  .calendar-title-icon {
+    font-size: 22px;
+  }
+
+  .calendar-back-button {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .week-day {
+    padding: 10px 2px;
+    font-size: 9px;
+  }
+
+  .calendar-day {
+    min-height: 85px;
+    padding: 6px;
+  }
+
+  .day-number > span {
+    font-size: 12px;
+  }
+
+  .day-number small {
+    display: none;
+  }
+
+  .mini-order {
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .mini-order-dot {
+    flex-basis: 5px;
+    width: 5px;
+    height: 5px;
+  }
+
+  .mini-order-name {
+    font-size: 9px;
+  }
+
+  .order-count {
+    display: none;
+  }
+
+  .month-navigation h2 {
+    min-width: 150px;
+    font-size: 17px;
+  }
+
+  .calendar-legend {
+    gap: 8px;
+    font-size: 10px;
+  }
+
+  .calendar-sidebar {
+    border-radius: 14px;
+  }
+
+  .sidebar-header {
+    padding: 18px;
+  }
+
+  .sidebar-content {
+    padding: 15px;
+  }
+
+  .calendar-sidebar .order-card {
+    padding: 13px;
+  }
+}

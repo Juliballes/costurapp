@@ -1,0 +1,337 @@
+/* ================================
+   LAYOUT GENERAL
+================================ */
+
+.app-layout {
+    min-height: 100vh;
+    display: flex;
+    background: #faf9fb;
+    color: #29252d;
+}
+
+
+/* ================================
+   SIDEBAR
+================================ */
+
+.sidebar {
+    width: 250px;
+    min-width: 250px;
+    height: 100vh;
+
+    position: sticky;
+    top: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 24px 16px;
+
+    background: #ffffff;
+
+    border-right: 1px solid #eeeaf0;
+
+    box-sizing: border-box;
+}
+
+
+/* ================================
+   LOGO
+================================ */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 4px 10px 28px;
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: #f8e9f0;
+
+    font-size: 22px;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.logo-text h2 {
+    margin: 0;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    letter-spacing: -0.3px;
+}
+
+.logo-text span {
+    font-size: 11px;
+    color: #9b929d;
+}
+
+
+/* ================================
+   NAVEGACIÓN
+================================ */
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+/* ================================
+   BOTONES DEL MENÚ
+================================ */
+
+.menu-button {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 11px 13px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: #706874;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.menu-button:hover {
+    background: #faf5f8;
+    color: #4e4650;
+
+    transform: translateX(2px);
+}
+
+.menu-button.active {
+    background: #f8e9f0;
+    color: #9b4d70;
+
+    font-weight: 600;
+}
+
+.menu-icon {
+    width: 22px;
+
+    display: flex;
+    justify-content: center;
+
+    font-size: 17px;
+}
+
+
+/* ================================
+   PARTE INFERIOR
+================================ */
+
+.sidebar-bottom {
+    margin-top: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+
+/* ================================
+   FOOTER SIDEBAR
+================================ */
+
+.sidebar-footer {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 14px 10px;
+
+    border-top: 1px solid #f0edf1;
+}
+
+.footer-icon {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #f8e9f0;
+
+    font-size: 16px;
+}
+
+.sidebar-footer div:last-child {
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+.sidebar-footer strong {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sidebar-footer span {
+    font-size: 10px;
+    color: #aaa2ab;
+}
+
+
+/* ================================
+   CONTENIDO PRINCIPAL
+================================ */
+
+.main-content {
+    flex: 1;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 40px 48px;
+
+    box-sizing: border-box;
+}
+
+
+/* ================================
+   RESPONSIVE - PANTALLAS GRANDES
+================================ */
+
+@media (min-width: 1600px) {
+    .sidebar {
+        width: 270px;
+        min-width: 270px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .main-content {
+        padding: 48px 64px;
+    }
+}
+
+
+/* ================================
+   TABLET
+================================ */
+
+@media (max-width: 900px) {
+    .sidebar {
+        width: 210px;
+        min-width: 210px;
+    }
+
+    .main-content {
+        padding: 30px;
+    }
+
+    .logo-text span {
+        display: none;
+    }
+}
+
+
+/* ================================
+   CELULAR
+================================ */
+
+@media (max-width: 700px) {
+
+    .app-layout {
+        display: block;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 0;
+
+        z-index: 100;
+
+        width: 100%;
+        min-width: 0;
+        height: auto;
+
+        padding: 10px 14px;
+
+        border-right: none;
+        border-bottom: 1px solid #eeeaf0;
+    }
+
+    .logo {
+        padding: 2px 4px 10px;
+    }
+
+    .logo-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .logo-text h2 {
+        font-size: 16px;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+
+        gap: 5px;
+    }
+
+    .sidebar-nav .menu-button {
+        justify-content: center;
+
+        padding: 9px 6px;
+    }
+
+    .sidebar-nav .menu-button span:last-child {
+        display: none;
+    }
+
+    .menu-icon {
+        width: auto;
+    }
+
+    .sidebar-bottom {
+        display: none;
+    }
+
+    .main-content {
+        padding: 24px 16px;
+    }
+}
