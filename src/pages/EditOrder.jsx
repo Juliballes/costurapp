@@ -48,13 +48,13 @@ function EditOrder({ pedido, onBack, onSaved }) {
     );
 
     // =====================================================
-    // ESTADO
+    // GUARDANDO
     // =====================================================
 
     const [guardando, setGuardando] = useState(false);
 
     // =====================================================
-    // ACTUALIZAR SI CAMBIA EL PEDIDO
+    // ACTUALIZAR DATOS CUANDO CAMBIA EL PEDIDO
     // =====================================================
 
     useEffect(() => {
@@ -129,13 +129,12 @@ function EditOrder({ pedido, onBack, onSaved }) {
         nuevoEstado
     ) => {
         if (
-            nuevoEstado ===
-            "pagado"
+            nuevoEstado === "pagado"
         ) {
             setPagado(true);
 
-            // Al marcar como pagado,
-            // la seña pasa a ser el total.
+            // Si queda pagado,
+            // la seña representa el total.
             setSena(
                 String(
                     precioNumerico
@@ -147,23 +146,6 @@ function EditOrder({ pedido, onBack, onSaved }) {
 
         // Volver a pendiente
         setPagado(false);
-
-        // Si la seña anteriormente
-        // era igual al total, la dejamos
-        // en el valor actual para que
-        // la mamá pueda modificarla.
-        setSena((valorActual) => {
-            const valor =
-                Number(valorActual) ||
-                0;
-
-            return valor >
-                precioNumerico
-                ? String(
-                      precioNumerico
-                  )
-                : valorActual;
-        });
     };
 
     // =====================================================
@@ -173,201 +155,170 @@ function EditOrder({ pedido, onBack, onSaved }) {
     const manejarCambioPrecio = (
         valor
     ) => {
-        const nuevoPrecio =
-            valor;
+        setPrecio(valor);
 
-        setPrecio(
-            nuevoPrecio
-        );
-
-        // Si estaba completamente
-        // pagado, mantenemos seña =
-        // nuevo total.
+        // Si estaba pagado,
+        // mantenemos la seña igual al nuevo total.
         if (pagado) {
             setSena(
                 String(
-                    Number(
-                        nuevoPrecio
-                    ) || 0
+                    Number(valor) || 0
                 )
             );
         }
     };
 
     // =====================================================
-    // GUARDAR
+    // GUARDAR CAMBIOS
     // =====================================================
 
-    const guardarCambios =
-        async (e) => {
-            e.preventDefault();
+    const guardarCambios = async (e) => {
+        e.preventDefault();
 
-            if (guardando) {
-                return;
-            }
+        if (guardando) {
+            return;
+        }
 
-            // =============================================
-            // VALIDACIONES
-            // =============================================
+        // =================================================
+        // VALIDACIONES
+        // =================================================
 
-            if (!tipoPrenda) {
-                alert(
-                    "Seleccioná el tipo de prenda."
-                );
-                return;
-            }
-
-            if (!fechaEntrega) {
-                alert(
-                    "Seleccioná la fecha de entrega."
-                );
-                return;
-            }
-
-            if (
-                precioNumerico <
-                0
-            ) {
-                alert(
-                    "El precio no puede ser negativo."
-                );
-                return;
-            }
-
-            const senaFinal =
-                pagado
-                    ? precioNumerico
-                    : senaNumerica;
-
-            if (
-                senaFinal <
-                0
-            ) {
-                alert(
-                    "La seña no puede ser negativa."
-                );
-                return;
-            }
-
-            if (
-                senaFinal >
-                precioNumerico
-            ) {
-                alert(
-                    "La seña no puede ser mayor al precio total."
-                );
-                return;
-            }
-
-            setGuardando(
-                true
+        if (!tipoPrenda) {
+            alert(
+                "Seleccioná el tipo de prenda."
             );
+            return;
+        }
 
-            const {
-                data,
-                error,
-            } = await supabase
-                .from(
-                    "pedidos"
-                )
-                .update({
-                    tipo_prenda:
-                        tipoPrenda,
+        if (!fechaEntrega) {
+            alert(
+                "Seleccioná la fecha de entrega."
+            );
+            return;
+        }
 
-                    fecha_entrega:
-                        fechaEntrega,
+        if (precioNumerico < 0) {
+            alert(
+                "El precio no puede ser negativo."
+            );
+            return;
+        }
 
-                    descripcion:
-                        descripcion.trim(),
+        const senaFinal = pagado
+            ? precioNumerico
+            : senaNumerica;
 
-                    precio:
-                        precioNumerico,
+        if (senaFinal < 0) {
+            alert(
+                "La seña no puede ser negativa."
+            );
+            return;
+        }
 
-                    sena:
-                        senaFinal,
+        if (senaFinal > precioNumerico) {
+            alert(
+                "La seña no puede ser mayor al precio total."
+            );
+            return;
+        }
 
-                    estado:
-                        estado,
+        setGuardando(true);
 
-                    prioridad:
-                        prioridad,
+        const {
+            data,
+            error,
+        } = await supabase
+            .from("pedidos")
+            .update({
+                tipo_prenda:
+                    tipoPrenda,
 
-                    notas:
-                        notas.trim(),
+                fecha_entrega:
+                    fechaEntrega,
 
-                    pagado:
-                        pagado,
-                })
-                .eq(
-                    "id",
-                    pedido.id
-                )
-                .select(`
+                descripcion:
+                    descripcion.trim(),
+
+                precio:
+                    precioNumerico,
+
+                sena:
+                    senaFinal,
+
+                estado:
+                    estado,
+
+                prioridad:
+                    prioridad,
+
+                notas:
+                    notas.trim(),
+
+                pagado:
+                    pagado,
+            })
+            .eq(
+                "id",
+                pedido.id
+            )
+            .select(`
+                id,
+                tipo_prenda,
+                descripcion,
+                fecha_entrega,
+                precio,
+                sena,
+                estado,
+                prioridad,
+                notas,
+                pagado,
+                clientes (
+                    id,
+                    nombre,
+                    telefono
+                ),
+                pedido_prendas (
                     id,
                     tipo_prenda,
+                    cantidad,
                     descripcion,
-                    fecha_entrega,
-                    precio,
-                    sena,
-                    estado,
-                    prioridad,
-                    notas,
-                    pagado,
-                    clientes (
-                        id,
-                        nombre,
-                        telefono
-                    ),
-                    pedido_prendas (
-                        id,
-                        tipo_prenda,
-                        cantidad,
-                        descripcion,
-                        precio
-                    )
-                `)
-                .single();
+                    precio
+                )
+            `)
+            .single();
 
-            if (error) {
-                console.error(
-                    "Error actualizando pedido:",
-                    error
-                );
-
-                alert(
-                    "No se pudo guardar el pedido.\n\n" +
-                        error.message
-                );
-
-                setGuardando(
-                    false
-                );
-
-                return;
-            }
+        if (error) {
+            console.error(
+                "Error actualizando pedido:",
+                error
+            );
 
             alert(
-                pagado
-                    ? "¡Pedido actualizado y marcado como pagado! 💚"
-                    : "¡Pedido actualizado correctamente! 🧵❤️"
+                "No se pudo guardar el pedido.\n\n" +
+                    error.message
             );
 
-            setGuardando(
-                false
-            );
+            setGuardando(false);
+            return;
+        }
 
-            if (onSaved) {
-                await onSaved(
-                    data
-                );
+        alert(
+            pagado
+                ? "¡Pedido actualizado y marcado como pagado! 💚"
+                : "¡Pedido actualizado correctamente! 🧵❤️"
+        );
 
-                return;
-            }
+        setGuardando(false);
 
-            if (onBack) {
-                onBack();
-            }
-        };
+        if (onSaved) {
+            await onSaved(data);
+            return;
+        }
+
+        if (onBack) {
+            onBack();
+        }
+    };
 
     // =====================================================
     // CANCELAR
@@ -390,19 +341,19 @@ function EditOrder({ pedido, onBack, onSaved }) {
     return (
         <div className="new-order-page">
 
-            {/* =========================================
+            {/* =================================================
                 ENCABEZADO
-            ========================================= */}
+            ================================================= */}
 
             <div className="page-header">
+
                 <div>
                     <h1>
                         Editar pedido ✏️
                     </h1>
 
                     <p>
-                        Modificá los datos del
-                        trabajo.
+                        Modificá los datos del trabajo.
                     </p>
                 </div>
 
@@ -414,20 +365,20 @@ function EditOrder({ pedido, onBack, onSaved }) {
                 >
                     ← Volver
                 </button>
+
             </div>
 
             <form
                 className="order-form"
-                onSubmit={
-                    guardarCambios
-                }
+                onSubmit={guardarCambios}
             >
 
-                {/* =====================================
+                {/* =================================================
                     CLIENTE
-                ===================================== */}
+                ================================================= */}
 
                 <div className="form-section">
+
                     <h2>
                         👤 Datos del cliente
                     </h2>
@@ -435,6 +386,7 @@ function EditOrder({ pedido, onBack, onSaved }) {
                     <div className="form-grid">
 
                         <div className="form-group">
+
                             <label>
                                 Nombre del cliente
                             </label>
@@ -442,16 +394,16 @@ function EditOrder({ pedido, onBack, onSaved }) {
                             <input
                                 type="text"
                                 value={
-                                    pedido
-                                        ?.clientes
-                                        ?.nombre ||
+                                    pedido?.clientes?.nombre ||
                                     ""
                                 }
                                 disabled
                             />
+
                         </div>
 
                         <div className="form-group">
+
                             <label>
                                 Teléfono
                             </label>
@@ -459,30 +411,29 @@ function EditOrder({ pedido, onBack, onSaved }) {
                             <input
                                 type="tel"
                                 value={
-                                    pedido
-                                        ?.clientes
-                                        ?.telefono ||
+                                    pedido?.clientes?.telefono ||
                                     ""
                                 }
                                 disabled
                             />
+
                         </div>
 
                     </div>
 
                     <small className="form-help">
-                        Los datos del cliente
-                        los vamos a poder
-                        editar desde la
-                        sección Clientes.
+                        Los datos del cliente los vamos a
+                        poder editar desde la sección Clientes.
                     </small>
+
                 </div>
 
-                {/* =====================================
-                    PEDIDO
-                ===================================== */}
+                {/* =================================================
+                    DATOS PEDIDO
+                ================================================= */}
 
                 <div className="form-section">
+
                     <h2>
                         🧵 Datos del pedido
                     </h2>
@@ -490,30 +441,24 @@ function EditOrder({ pedido, onBack, onSaved }) {
                     <div className="form-grid">
 
                         <div className="form-group">
+
                             <label>
                                 Tipo de prenda
                             </label>
 
                             <select
-                                value={
-                                    tipoPrenda
-                                }
-                                onChange={(
-                                    e
-                                ) =>
+                                value={tipoPrenda}
+                                onChange={(e) =>
                                     setTipoPrenda(
-                                        e.target
-                                            .value
+                                        e.target.value
                                     )
                                 }
-                                disabled={
-                                    guardando
-                                }
+                                disabled={guardando}
                                 required
                             >
+
                                 <option value="">
-                                    Seleccionar
-                                    prenda
+                                    Seleccionar prenda
                                 </option>
 
                                 <option value="Vestido">
@@ -543,72 +488,66 @@ function EditOrder({ pedido, onBack, onSaved }) {
                                 <option value="Otro">
                                     🧵 Otro
                                 </option>
+
                             </select>
+
                         </div>
 
                         <div className="form-group">
+
                             <label>
                                 Fecha de entrega
                             </label>
 
                             <input
                                 type="date"
-                                value={
-                                    fechaEntrega
-                                }
-                                onChange={(
-                                    e
-                                ) =>
+                                value={fechaEntrega}
+                                onChange={(e) =>
                                     setFechaEntrega(
-                                        e.target
-                                            .value
+                                        e.target.value
                                     )
                                 }
-                                disabled={
-                                    guardando
-                                }
+                                disabled={guardando}
                                 required
                             />
+
                         </div>
 
                     </div>
 
                     <div className="form-group">
+
                         <label>
-                            Descripción del
-                            trabajo
+                            Descripción del trabajo
                         </label>
 
                         <textarea
                             rows="4"
-                            value={
-                                descripcion
-                            }
-                            onChange={(
-                                e
-                            ) =>
+                            value={descripcion}
+                            onChange={(e) =>
                                 setDescripcion(
-                                    e.target
-                                        .value
+                                    e.target.value
                                 )
                             }
                             placeholder="Ej: Ajustar cintura y acortar 5 cm..."
-                            disabled={
-                                guardando
-                            }
+                            disabled={guardando}
                         />
+
                     </div>
+
                 </div>
 
-                {/* =====================================
-                    PAGO
-                ===================================== */}
+                {/* =================================================
+                    INFORMACIÓN DE PAGO
+                ================================================= */}
 
                 <div className="form-section">
 
                     <h2>
                         💰 Información de pago
                     </h2>
+
+                    {/* TOTAL / SEÑA / SALDO */}
 
                     <div className="payment-summary">
 
@@ -637,29 +576,18 @@ function EditOrder({ pedido, onBack, onSaved }) {
                                 type="number"
                                 min="0"
                                 step="0.01"
-                                value={
-                                    sena
-                                }
-                                onChange={(
-                                    e
-                                ) => {
+                                value={sena}
+                                onChange={(e) => {
                                     const valor =
-                                        e.target
-                                            .value;
+                                        e.target.value;
 
-                                    setSena(
-                                        valor
-                                    );
+                                    setSena(valor);
 
                                     if (
-                                        Number(
-                                            valor
-                                        ) <
+                                        Number(valor) <
                                         precioNumerico
                                     ) {
-                                        setPagado(
-                                            false
-                                        );
+                                        setPagado(false);
                                     }
                                 }}
                                 disabled={
@@ -678,8 +606,7 @@ function EditOrder({ pedido, onBack, onSaved }) {
 
                             <strong
                                 className={
-                                    saldoPendiente >
-                                    0
+                                    saldoPendiente > 0
                                         ? "saldo-pendiente"
                                         : "saldo-pagado"
                                 }
@@ -694,9 +621,9 @@ function EditOrder({ pedido, onBack, onSaved }) {
 
                     </div>
 
-                    {/* =================================
+                    {/* =================================================
                         ESTADO DEL PAGO
-                    ================================= */}
+                    ================================================= */}
 
                     <div className="payment-status-container">
 
@@ -709,18 +636,16 @@ function EditOrder({ pedido, onBack, onSaved }) {
                             <button
                                 type="button"
                                 className={
-                                    !pagado
-                                        ? "payment-status-button pending active"
-                                        : "payment-status-button pending"
+                                    pagado
+                                        ? "payment-status-button pending"
+                                        : "payment-status-button pending active"
                                 }
                                 onClick={() =>
                                     cambiarEstadoPago(
                                         "pendiente"
                                     )
                                 }
-                                disabled={
-                                    guardando
-                                }
+                                disabled={guardando}
                             >
                                 ⏳ Pago pendiente
                             </button>
@@ -737,9 +662,7 @@ function EditOrder({ pedido, onBack, onSaved }) {
                                         "pagado"
                                     )
                                 }
-                                disabled={
-                                    guardando
-                                }
+                                disabled={guardando}
                             >
                                 ✅ Pagado
                             </button>
@@ -747,17 +670,17 @@ function EditOrder({ pedido, onBack, onSaved }) {
                         </div>
 
                         <small className="payment-status-help">
-                            El pago es independiente
-                            del estado del trabajo.
+                            El pago es independiente del
+                            estado del trabajo.
                         </small>
 
                     </div>
 
                 </div>
 
-                {/* =====================================
-                    ESTADO
-                ===================================== */}
+                {/* =================================================
+                    ESTADO DEL PEDIDO
+                ================================================= */}
 
                 <div className="form-section">
 
@@ -768,26 +691,21 @@ function EditOrder({ pedido, onBack, onSaved }) {
                     <div className="form-grid">
 
                         <div className="form-group">
+
                             <label>
                                 Estado
                             </label>
 
                             <select
-                                value={
-                                    estado
-                                }
-                                onChange={(
-                                    e
-                                ) =>
+                                value={estado}
+                                onChange={(e) =>
                                     setEstado(
-                                        e.target
-                                            .value
+                                        e.target.value
                                     )
                                 }
-                                disabled={
-                                    guardando
-                                }
+                                disabled={guardando}
                             >
+
                                 <option value="En proceso">
                                     🟡 En proceso
                                 </option>
@@ -799,30 +717,27 @@ function EditOrder({ pedido, onBack, onSaved }) {
                                 <option value="Entregado">
                                     ⚪ Entregado
                                 </option>
+
                             </select>
+
                         </div>
 
                         <div className="form-group">
+
                             <label>
                                 Prioridad
                             </label>
 
                             <select
-                                value={
-                                    prioridad
-                                }
-                                onChange={(
-                                    e
-                                ) =>
+                                value={prioridad}
+                                onChange={(e) =>
                                     setPrioridad(
-                                        e.target
-                                            .value
+                                        e.target.value
                                     )
                                 }
-                                disabled={
-                                    guardando
-                                }
+                                disabled={guardando}
                             >
+
                                 <option value="Normal">
                                     🟢 Normal
                                 </option>
@@ -830,7 +745,9 @@ function EditOrder({ pedido, onBack, onSaved }) {
                                 <option value="Urgente">
                                     🔴 Urgente
                                 </option>
+
                             </select>
+
                         </div>
 
                     </div>
@@ -843,42 +760,31 @@ function EditOrder({ pedido, onBack, onSaved }) {
 
                         <textarea
                             rows="3"
-                            value={
-                                notas
-                            }
-                            onChange={(
-                                e
-                            ) =>
+                            value={notas}
+                            onChange={(e) =>
                                 setNotas(
-                                    e.target
-                                        .value
+                                    e.target.value
                                 )
                             }
                             placeholder="Cualquier detalle importante..."
-                            disabled={
-                                guardando
-                            }
+                            disabled={guardando}
                         />
 
                     </div>
 
                 </div>
 
-                {/* =====================================
+                {/* =================================================
                     BOTONES
-                ===================================== */}
+                ================================================= */}
 
                 <div className="form-actions">
 
                     <button
                         type="button"
                         className="cancel-button"
-                        onClick={
-                            cancelar
-                        }
-                        disabled={
-                            guardando
-                        }
+                        onClick={cancelar}
+                        disabled={guardando}
                     >
                         Cancelar
                     </button>
@@ -886,9 +792,7 @@ function EditOrder({ pedido, onBack, onSaved }) {
                     <button
                         type="submit"
                         className="save-button"
-                        disabled={
-                            guardando
-                        }
+                        disabled={guardando}
                     >
                         {guardando
                             ? "Guardando..."
@@ -898,6 +802,7 @@ function EditOrder({ pedido, onBack, onSaved }) {
                 </div>
 
             </form>
+
         </div>
     );
 }
