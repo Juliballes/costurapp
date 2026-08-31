@@ -1,475 +1,906 @@
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 function EditOrder({ pedido, onBack, onSaved }) {
-  const [tipoPrenda, setTipoPrenda] = useState(
-    pedido?.tipo_prenda || ""
-  );
+    // =====================================================
+    // DATOS DEL PEDIDO
+    // =====================================================
 
-  const [fechaEntrega, setFechaEntrega] = useState(
-    pedido?.fecha_entrega || ""
-  );
+    const [tipoPrenda, setTipoPrenda] = useState(
+        pedido?.tipo_prenda || ""
+    );
 
-  const [descripcion, setDescripcion] = useState(
-    pedido?.descripcion || ""
-  );
+    const [fechaEntrega, setFechaEntrega] = useState(
+        pedido?.fecha_entrega || ""
+    );
 
-  const [precio, setPrecio] = useState(
-    pedido?.precio || ""
-  );
+    const [descripcion, setDescripcion] = useState(
+        pedido?.descripcion || ""
+    );
 
-  const [sena, setSena] = useState(
-    pedido?.sena || ""
-  );
+    const [precio, setPrecio] = useState(
+        pedido?.precio ?? ""
+    );
 
-  const [estado, setEstado] = useState(
-    pedido?.estado || "En proceso"
-  );
+    const [sena, setSena] = useState(
+        pedido?.sena ?? ""
+    );
 
-  const [prioridad, setPrioridad] = useState(
-    pedido?.prioridad || "Normal"
-  );
+    const [estado, setEstado] = useState(
+        pedido?.estado || "En proceso"
+    );
 
-  const [notas, setNotas] = useState(
-    pedido?.notas || ""
-  );
+    const [prioridad, setPrioridad] = useState(
+        pedido?.prioridad || "Normal"
+    );
 
-  const [guardando, setGuardando] = useState(false);
+    const [notas, setNotas] = useState(
+        pedido?.notas || ""
+    );
 
-  const guardarCambios = async (e) => {
-    e.preventDefault();
+    // =====================================================
+    // PAGO
+    // =====================================================
 
-    setGuardando(true);
+    const [pagado, setPagado] = useState(
+        Boolean(pedido?.pagado)
+    );
 
-    const { data, error } = await supabase
-      .from("pedidos")
-      .update({
-        tipo_prenda: tipoPrenda,
-        fecha_entrega: fechaEntrega,
-        descripcion: descripcion,
-        precio: Number(precio) || 0,
-        sena: Number(sena) || 0,
-        estado: estado,
-        prioridad: prioridad,
-        notas: notas,
-      })
-      .eq("id", pedido.id)
-      .select(`
-        id,
-        tipo_prenda,
-        descripcion,
-        fecha_entrega,
-        precio,
-        sena,
-        estado,
-        prioridad,
-        notas,
-        clientes (
-          nombre,
-          telefono
-        )
-      `)
-      .single();
+    // =====================================================
+    // ESTADO
+    // =====================================================
 
-    if (error) {
-      console.error("Error actualizando pedido:", error);
+    const [guardando, setGuardando] = useState(false);
 
-      alert(
-        "No se pudo guardar el pedido.\n\n" +
-        error.message
-      );
+    // =====================================================
+    // ACTUALIZAR SI CAMBIA EL PEDIDO
+    // =====================================================
 
-      setGuardando(false);
-      return;
-    }
+    useEffect(() => {
+        setTipoPrenda(
+            pedido?.tipo_prenda || ""
+        );
 
-    alert("¡Pedido actualizado correctamente! 🧵❤️");
+        setFechaEntrega(
+            pedido?.fecha_entrega || ""
+        );
 
-    setGuardando(false);
+        setDescripcion(
+            pedido?.descripcion || ""
+        );
 
-    if (onSaved) {
-      onSaved(data);
-    }
-    if (onBack) {
-  onBack();
-}
-  };
+        setPrecio(
+            pedido?.precio ?? ""
+        );
 
-  return (
-    <div className="new-order-page">
+        setSena(
+            pedido?.sena ?? ""
+        );
 
-      {/* =========================
-          ENCABEZADO
-      ========================= */}
+        setEstado(
+            pedido?.estado || "En proceso"
+        );
 
-      <div className="page-header">
+        setPrioridad(
+            pedido?.prioridad || "Normal"
+        );
 
-        <div>
+        setNotas(
+            pedido?.notas || ""
+        );
 
-          <h1>
-            Editar pedido ✏️
-          </h1>
+        setPagado(
+            Boolean(pedido?.pagado)
+        );
+    }, [pedido]);
 
-          <p>
-            Modificá los datos del trabajo.
-          </p>
+    // =====================================================
+    // PRECIO
+    // =====================================================
 
+    const precioNumerico =
+        Number(precio) || 0;
+
+    // =====================================================
+    // SEÑA
+    // =====================================================
+
+    const senaNumerica =
+        Number(sena) || 0;
+
+    // =====================================================
+    // SALDO
+    // =====================================================
+
+    const saldoPendiente = pagado
+        ? 0
+        : Math.max(
+              0,
+              precioNumerico -
+                  senaNumerica
+          );
+
+    // =====================================================
+    // CAMBIAR ESTADO DE PAGO
+    // =====================================================
+
+    const cambiarEstadoPago = (
+        nuevoEstado
+    ) => {
+        if (
+            nuevoEstado ===
+            "pagado"
+        ) {
+            setPagado(true);
+
+            // Al marcar como pagado,
+            // la seña pasa a ser el total.
+            setSena(
+                String(
+                    precioNumerico
+                )
+            );
+
+            return;
+        }
+
+        // Volver a pendiente
+        setPagado(false);
+
+        // Si la seña anteriormente
+        // era igual al total, la dejamos
+        // en el valor actual para que
+        // la mamá pueda modificarla.
+        setSena((valorActual) => {
+            const valor =
+                Number(valorActual) ||
+                0;
+
+            return valor >
+                precioNumerico
+                ? String(
+                      precioNumerico
+                  )
+                : valorActual;
+        });
+    };
+
+    // =====================================================
+    // CAMBIAR PRECIO
+    // =====================================================
+
+    const manejarCambioPrecio = (
+        valor
+    ) => {
+        const nuevoPrecio =
+            valor;
+
+        setPrecio(
+            nuevoPrecio
+        );
+
+        // Si estaba completamente
+        // pagado, mantenemos seña =
+        // nuevo total.
+        if (pagado) {
+            setSena(
+                String(
+                    Number(
+                        nuevoPrecio
+                    ) || 0
+                )
+            );
+        }
+    };
+
+    // =====================================================
+    // GUARDAR
+    // =====================================================
+
+    const guardarCambios =
+        async (e) => {
+            e.preventDefault();
+
+            if (guardando) {
+                return;
+            }
+
+            // =============================================
+            // VALIDACIONES
+            // =============================================
+
+            if (!tipoPrenda) {
+                alert(
+                    "Seleccioná el tipo de prenda."
+                );
+                return;
+            }
+
+            if (!fechaEntrega) {
+                alert(
+                    "Seleccioná la fecha de entrega."
+                );
+                return;
+            }
+
+            if (
+                precioNumerico <
+                0
+            ) {
+                alert(
+                    "El precio no puede ser negativo."
+                );
+                return;
+            }
+
+            const senaFinal =
+                pagado
+                    ? precioNumerico
+                    : senaNumerica;
+
+            if (
+                senaFinal <
+                0
+            ) {
+                alert(
+                    "La seña no puede ser negativa."
+                );
+                return;
+            }
+
+            if (
+                senaFinal >
+                precioNumerico
+            ) {
+                alert(
+                    "La seña no puede ser mayor al precio total."
+                );
+                return;
+            }
+
+            setGuardando(
+                true
+            );
+
+            const {
+                data,
+                error,
+            } = await supabase
+                .from(
+                    "pedidos"
+                )
+                .update({
+                    tipo_prenda:
+                        tipoPrenda,
+
+                    fecha_entrega:
+                        fechaEntrega,
+
+                    descripcion:
+                        descripcion.trim(),
+
+                    precio:
+                        precioNumerico,
+
+                    sena:
+                        senaFinal,
+
+                    estado:
+                        estado,
+
+                    prioridad:
+                        prioridad,
+
+                    notas:
+                        notas.trim(),
+
+                    pagado:
+                        pagado,
+                })
+                .eq(
+                    "id",
+                    pedido.id
+                )
+                .select(`
+                    id,
+                    tipo_prenda,
+                    descripcion,
+                    fecha_entrega,
+                    precio,
+                    sena,
+                    estado,
+                    prioridad,
+                    notas,
+                    pagado,
+                    clientes (
+                        id,
+                        nombre,
+                        telefono
+                    ),
+                    pedido_prendas (
+                        id,
+                        tipo_prenda,
+                        cantidad,
+                        descripcion,
+                        precio
+                    )
+                `)
+                .single();
+
+            if (error) {
+                console.error(
+                    "Error actualizando pedido:",
+                    error
+                );
+
+                alert(
+                    "No se pudo guardar el pedido.\n\n" +
+                        error.message
+                );
+
+                setGuardando(
+                    false
+                );
+
+                return;
+            }
+
+            alert(
+                pagado
+                    ? "¡Pedido actualizado y marcado como pagado! 💚"
+                    : "¡Pedido actualizado correctamente! 🧵❤️"
+            );
+
+            setGuardando(
+                false
+            );
+
+            if (onSaved) {
+                await onSaved(
+                    data
+                );
+
+                return;
+            }
+
+            if (onBack) {
+                onBack();
+            }
+        };
+
+    // =====================================================
+    // CANCELAR
+    // =====================================================
+
+    const cancelar = () => {
+        if (guardando) {
+            return;
+        }
+
+        if (onBack) {
+            onBack();
+        }
+    };
+
+    // =====================================================
+    // INTERFAZ
+    // =====================================================
+
+    return (
+        <div className="new-order-page">
+
+            {/* =========================================
+                ENCABEZADO
+            ========================================= */}
+
+            <div className="page-header">
+                <div>
+                    <h1>
+                        Editar pedido ✏️
+                    </h1>
+
+                    <p>
+                        Modificá los datos del
+                        trabajo.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    className="back-button"
+                    onClick={cancelar}
+                    disabled={guardando}
+                >
+                    ← Volver
+                </button>
+            </div>
+
+            <form
+                className="order-form"
+                onSubmit={
+                    guardarCambios
+                }
+            >
+
+                {/* =====================================
+                    CLIENTE
+                ===================================== */}
+
+                <div className="form-section">
+                    <h2>
+                        👤 Datos del cliente
+                    </h2>
+
+                    <div className="form-grid">
+
+                        <div className="form-group">
+                            <label>
+                                Nombre del cliente
+                            </label>
+
+                            <input
+                                type="text"
+                                value={
+                                    pedido
+                                        ?.clientes
+                                        ?.nombre ||
+                                    ""
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>
+                                Teléfono
+                            </label>
+
+                            <input
+                                type="tel"
+                                value={
+                                    pedido
+                                        ?.clientes
+                                        ?.telefono ||
+                                    ""
+                                }
+                                disabled
+                            />
+                        </div>
+
+                    </div>
+
+                    <small className="form-help">
+                        Los datos del cliente
+                        los vamos a poder
+                        editar desde la
+                        sección Clientes.
+                    </small>
+                </div>
+
+                {/* =====================================
+                    PEDIDO
+                ===================================== */}
+
+                <div className="form-section">
+                    <h2>
+                        🧵 Datos del pedido
+                    </h2>
+
+                    <div className="form-grid">
+
+                        <div className="form-group">
+                            <label>
+                                Tipo de prenda
+                            </label>
+
+                            <select
+                                value={
+                                    tipoPrenda
+                                }
+                                onChange={(
+                                    e
+                                ) =>
+                                    setTipoPrenda(
+                                        e.target
+                                            .value
+                                    )
+                                }
+                                disabled={
+                                    guardando
+                                }
+                                required
+                            >
+                                <option value="">
+                                    Seleccionar
+                                    prenda
+                                </option>
+
+                                <option value="Vestido">
+                                    👗 Vestido
+                                </option>
+
+                                <option value="Pantalón">
+                                    👖 Pantalón
+                                </option>
+
+                                <option value="Blusa">
+                                    👚 Blusa
+                                </option>
+
+                                <option value="Camisa">
+                                    👔 Camisa
+                                </option>
+
+                                <option value="Saco">
+                                    🧥 Saco
+                                </option>
+
+                                <option value="Falda">
+                                    👗 Falda
+                                </option>
+
+                                <option value="Otro">
+                                    🧵 Otro
+                                </option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>
+                                Fecha de entrega
+                            </label>
+
+                            <input
+                                type="date"
+                                value={
+                                    fechaEntrega
+                                }
+                                onChange={(
+                                    e
+                                ) =>
+                                    setFechaEntrega(
+                                        e.target
+                                            .value
+                                    )
+                                }
+                                disabled={
+                                    guardando
+                                }
+                                required
+                            />
+                        </div>
+
+                    </div>
+
+                    <div className="form-group">
+                        <label>
+                            Descripción del
+                            trabajo
+                        </label>
+
+                        <textarea
+                            rows="4"
+                            value={
+                                descripcion
+                            }
+                            onChange={(
+                                e
+                            ) =>
+                                setDescripcion(
+                                    e.target
+                                        .value
+                                )
+                            }
+                            placeholder="Ej: Ajustar cintura y acortar 5 cm..."
+                            disabled={
+                                guardando
+                            }
+                        />
+                    </div>
+                </div>
+
+                {/* =====================================
+                    PAGO
+                ===================================== */}
+
+                <div className="form-section">
+
+                    <h2>
+                        💰 Información de pago
+                    </h2>
+
+                    <div className="payment-summary">
+
+                        <div className="payment-summary-item">
+
+                            <span>
+                                Total del pedido
+                            </span>
+
+                            <strong>
+                                $
+                                {precioNumerico.toLocaleString(
+                                    "es-AR"
+                                )}
+                            </strong>
+
+                        </div>
+
+                        <div className="payment-summary-item">
+
+                            <span>
+                                Seña
+                            </span>
+
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={
+                                    sena
+                                }
+                                onChange={(
+                                    e
+                                ) => {
+                                    const valor =
+                                        e.target
+                                            .value;
+
+                                    setSena(
+                                        valor
+                                    );
+
+                                    if (
+                                        Number(
+                                            valor
+                                        ) <
+                                        precioNumerico
+                                    ) {
+                                        setPagado(
+                                            false
+                                        );
+                                    }
+                                }}
+                                disabled={
+                                    guardando ||
+                                    pagado
+                                }
+                            />
+
+                        </div>
+
+                        <div className="payment-summary-item">
+
+                            <span>
+                                Saldo pendiente
+                            </span>
+
+                            <strong
+                                className={
+                                    saldoPendiente >
+                                    0
+                                        ? "saldo-pendiente"
+                                        : "saldo-pagado"
+                                }
+                            >
+                                $
+                                {saldoPendiente.toLocaleString(
+                                    "es-AR"
+                                )}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    {/* =================================
+                        ESTADO DEL PAGO
+                    ================================= */}
+
+                    <div className="payment-status-container">
+
+                        <span className="payment-status-label">
+                            Estado del pago
+                        </span>
+
+                        <div className="payment-status-options">
+
+                            <button
+                                type="button"
+                                className={
+                                    !pagado
+                                        ? "payment-status-button pending active"
+                                        : "payment-status-button pending"
+                                }
+                                onClick={() =>
+                                    cambiarEstadoPago(
+                                        "pendiente"
+                                    )
+                                }
+                                disabled={
+                                    guardando
+                                }
+                            >
+                                ⏳ Pago pendiente
+                            </button>
+
+                            <button
+                                type="button"
+                                className={
+                                    pagado
+                                        ? "payment-status-button paid active"
+                                        : "payment-status-button paid"
+                                }
+                                onClick={() =>
+                                    cambiarEstadoPago(
+                                        "pagado"
+                                    )
+                                }
+                                disabled={
+                                    guardando
+                                }
+                            >
+                                ✅ Pagado
+                            </button>
+
+                        </div>
+
+                        <small className="payment-status-help">
+                            El pago es independiente
+                            del estado del trabajo.
+                        </small>
+
+                    </div>
+
+                </div>
+
+                {/* =====================================
+                    ESTADO
+                ===================================== */}
+
+                <div className="form-section">
+
+                    <h2>
+                        📌 Estado del pedido
+                    </h2>
+
+                    <div className="form-grid">
+
+                        <div className="form-group">
+                            <label>
+                                Estado
+                            </label>
+
+                            <select
+                                value={
+                                    estado
+                                }
+                                onChange={(
+                                    e
+                                ) =>
+                                    setEstado(
+                                        e.target
+                                            .value
+                                    )
+                                }
+                                disabled={
+                                    guardando
+                                }
+                            >
+                                <option value="En proceso">
+                                    🟡 En proceso
+                                </option>
+
+                                <option value="Listo">
+                                    🟢 Listo
+                                </option>
+
+                                <option value="Entregado">
+                                    ⚪ Entregado
+                                </option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>
+                                Prioridad
+                            </label>
+
+                            <select
+                                value={
+                                    prioridad
+                                }
+                                onChange={(
+                                    e
+                                ) =>
+                                    setPrioridad(
+                                        e.target
+                                            .value
+                                    )
+                                }
+                                disabled={
+                                    guardando
+                                }
+                            >
+                                <option value="Normal">
+                                    🟢 Normal
+                                </option>
+
+                                <option value="Urgente">
+                                    🔴 Urgente
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div className="form-group">
+
+                        <label>
+                            Notas
+                        </label>
+
+                        <textarea
+                            rows="3"
+                            value={
+                                notas
+                            }
+                            onChange={(
+                                e
+                            ) =>
+                                setNotas(
+                                    e.target
+                                        .value
+                                )
+                            }
+                            placeholder="Cualquier detalle importante..."
+                            disabled={
+                                guardando
+                            }
+                        />
+
+                    </div>
+
+                </div>
+
+                {/* =====================================
+                    BOTONES
+                ===================================== */}
+
+                <div className="form-actions">
+
+                    <button
+                        type="button"
+                        className="cancel-button"
+                        onClick={
+                            cancelar
+                        }
+                        disabled={
+                            guardando
+                        }
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        className="save-button"
+                        disabled={
+                            guardando
+                        }
+                    >
+                        {guardando
+                            ? "Guardando..."
+                            : "✓ Guardar cambios"}
+                    </button>
+
+                </div>
+
+            </form>
         </div>
-
-        <button
-          className="back-button"
-          onClick={onBack}
-          disabled={guardando}
-        >
-          ← Volver
-        </button>
-
-      </div>
-
-      <form
-        className="order-form"
-        onSubmit={guardarCambios}
-      >
-
-        {/* =========================
-            CLIENTE
-        ========================= */}
-
-        <div className="form-section">
-
-          <h2>
-            👤 Datos del cliente
-          </h2>
-
-          <div className="form-grid">
-
-            <div className="form-group">
-
-              <label>
-                Nombre del cliente
-              </label>
-
-              <input
-                type="text"
-                value={
-                  pedido?.clientes?.nombre || ""
-                }
-                disabled
-              />
-
-            </div>
-
-            <div className="form-group">
-
-              <label>
-                Teléfono
-              </label>
-
-              <input
-                type="tel"
-                value={
-                  pedido?.clientes?.telefono || ""
-                }
-                disabled
-              />
-
-            </div>
-
-          </div>
-
-          <small className="form-help">
-            Los datos del cliente los vamos a poder
-            editar desde la sección Clientes.
-          </small>
-
-        </div>
-
-        {/* =========================
-            PEDIDO
-        ========================= */}
-
-        <div className="form-section">
-
-          <h2>
-            🧵 Datos del pedido
-          </h2>
-
-          <div className="form-grid">
-
-            <div className="form-group">
-
-              <label>
-                Tipo de prenda
-              </label>
-
-              <select
-                value={tipoPrenda}
-                onChange={(e) =>
-                  setTipoPrenda(e.target.value)
-                }
-                required
-              >
-
-                <option value="">
-                  Seleccionar prenda
-                </option>
-
-                <option value="Vestido">
-                  Vestido
-                </option>
-
-                <option value="Pantalón">
-                  Pantalón
-                </option>
-
-                <option value="Blusa">
-                  Blusa
-                </option>
-
-                <option value="Camisa">
-                  Camisa
-                </option>
-
-                <option value="Saco">
-                  Saco
-                </option>
-
-                <option value="Falda">
-                  Falda
-                </option>
-
-                <option value="Otro">
-                  Otro
-                </option>
-
-              </select>
-
-            </div>
-
-            <div className="form-group">
-
-              <label>
-                Fecha de entrega
-              </label>
-
-              <input
-                type="date"
-                value={fechaEntrega}
-                onChange={(e) =>
-                  setFechaEntrega(e.target.value)
-                }
-                required
-              />
-
-            </div>
-
-          </div>
-
-          <div className="form-group">
-
-            <label>
-              Descripción del trabajo
-            </label>
-
-            <textarea
-              rows="4"
-              value={descripcion}
-              onChange={(e) =>
-                setDescripcion(e.target.value)
-              }
-              placeholder="Ej: Ajustar cintura y acortar 5 cm..."
-            />
-
-          </div>
-
-        </div>
-
-        {/* =========================
-            PAGO
-        ========================= */}
-
-        <div className="form-section">
-
-          <h2>
-            💰 Información de pago
-          </h2>
-
-          <div className="form-grid">
-
-            <div className="form-group">
-
-              <label>
-                Precio total
-              </label>
-
-              <input
-                type="number"
-                min="0"
-                value={precio}
-                onChange={(e) =>
-                  setPrecio(e.target.value)
-                }
-              />
-
-            </div>
-
-            <div className="form-group">
-
-              <label>
-                Seña
-              </label>
-
-              <input
-                type="number"
-                min="0"
-                value={sena}
-                onChange={(e) =>
-                  setSena(e.target.value)
-                }
-              />
-
-            </div>
-
-          </div>
-
-          <div className="payment-preview">
-
-            <span>
-              Saldo pendiente:
-            </span>
-
-            <strong>
-              $
-              {(
-                (Number(precio) || 0) -
-                (Number(sena) || 0)
-              ).toLocaleString("es-AR")}
-            </strong>
-
-          </div>
-
-        </div>
-
-        {/* =========================
-            ESTADO
-        ========================= */}
-
-        <div className="form-section">
-
-          <h2>
-            📌 Estado del pedido
-          </h2>
-
-          <div className="form-grid">
-
-            <div className="form-group">
-
-              <label>
-                Estado
-              </label>
-
-              <select
-                value={estado}
-                onChange={(e) =>
-                  setEstado(e.target.value)
-                }
-              >
-
-                <option value="En proceso">
-                  En proceso
-                </option>
-
-                <option value="Listo">
-                  Listo
-                </option>
-
-                <option value="Entregado">
-                  Entregado
-                </option>
-
-              </select>
-
-            </div>
-
-            <div className="form-group">
-
-              <label>
-                Prioridad
-              </label>
-
-              <select
-                value={prioridad}
-                onChange={(e) =>
-                  setPrioridad(e.target.value)
-                }
-              >
-
-                <option value="Normal">
-                  Normal
-                </option>
-
-                <option value="Urgente">
-                  Urgente
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
-
-          <div className="form-group">
-
-            <label>
-              Notas
-            </label>
-
-            <textarea
-              rows="3"
-              value={notas}
-              onChange={(e) =>
-                setNotas(e.target.value)
-              }
-              placeholder="Cualquier detalle importante..."
-            />
-
-          </div>
-
-        </div>
-
-        {/* =========================
-            BOTONES
-        ========================= */}
-
-        <div className="form-actions">
-
-          <button
-            type="button"
-            className="cancel-button"
-            onClick={onBack}
-            disabled={guardando}
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="submit"
-            className="save-button"
-            disabled={guardando}
-          >
-
-            {guardando
-              ? "Guardando..."
-              : "✓ Guardar cambios"}
-
-          </button>
-
-        </div>
-
-      </form>
-
-    </div>
-  );
+    );
 }
 
 export default EditOrder;
+

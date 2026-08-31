@@ -5072,3 +5072,247 @@ textarea {
         padding-right: 16px !important;
     }
 }
+/* =========================================================
+   ESTADO DE PAGO
+========================================================= */
+
+.payment-status-container {
+    margin-top: 20px;
+    padding: 17px;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    background: #fcfafb;
+}
+
+.payment-status-label {
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: var(--text);
+
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.payment-status-options {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+}
+
+.payment-status-button {
+    min-height: 46px;
+
+    border-radius: 11px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.18s ease,
+        box-shadow 0.2s ease;
+}
+
+.payment-status-button.pending {
+    border: 1px solid #eadfbe;
+
+    background: #fffaf0;
+
+    color: #a07827;
+}
+
+.payment-status-button.pending:hover {
+    background: #fff4d8;
+
+    transform: translateY(-1px);
+}
+
+.payment-status-button.pending.active {
+    border-color: #e5c979;
+
+    background: #fff0c7;
+
+    color: #946d19;
+
+    box-shadow:
+        0 4px 12px rgba(201, 146, 40, 0.10);
+}
+
+.payment-status-button.paid {
+    border: 1px solid #cfe8d7;
+
+    background: #f4fbf6;
+
+    color: #4d9063;
+}
+
+.payment-status-button.paid:hover {
+    background: #eaf7ee;
+
+    transform: translateY(-1px);
+}
+
+.payment-status-button.paid.active {
+    border-color: #a9d5b7;
+
+    background: #def2e4;
+
+    color: #277643;
+
+    box-shadow:
+        0 4px 12px rgba(77, 155, 106, 0.10);
+}
+
+.payment-status-help {
+    display: block;
+
+    margin-top: 9px;
+
+    color: var(--text-light);
+
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    .payment-status-options {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-status-button {
+        width: 100%;
+    }
+}
+/* =========================================================
+   ESTADO DE PAGO - CORRECCIÓN
+========================================================= */
+
+.payment-status-container {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin-top: 22px !important;
+    padding: 18px !important;
+
+    border: 1px solid #eadfe5 !important;
+    border-radius: 15px !important;
+
+    background: #fcfafb !important;
+}
+
+.payment-status-label {
+    display: block !important;
+
+    margin-bottom: 12px !important;
+
+    color: #3d3540 !important;
+
+    font-size: 15px !important;
+    font-weight: 750 !important;
+}
+
+.payment-status-options {
+    display: grid !important;
+
+    grid-template-columns: 1fr 1fr !important;
+
+    gap: 12px !important;
+
+    width: 100% !important;
+}
+
+.payment-status-button {
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 48px !important;
+
+    border-radius: 12px !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+
+    cursor: pointer !important;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease !important;
+}
+
+.payment-status-button.pending {
+    border: 1px solid #eadfbe !important;
+
+    background: #fffaf0 !important;
+
+    color: #a07827 !important;
+}
+
+.payment-status-button.pending.active {
+    border-color: #dfc56f !important;
+
+    background: #fff0c7 !important;
+
+    color: #8f6818 !important;
+
+    box-shadow:
+        0 5px 15px rgba(201, 146, 40, 0.12) !important;
+}
+
+.payment-status-button.paid {
+    border: 1px solid #cfe8d7 !important;
+
+    background: #f4fbf6 !important;
+
+    color: #4d9063 !important;
+}
+
+.payment-status-button.paid.active {
+    border-color: #a8d4b5 !important;
+
+    background: #def2e4 !important;
+
+    color: #277643 !important;
+
+    box-shadow:
+        0 5px 15px rgba(77, 155, 106, 0.12) !important;
+}
+
+.payment-status-button:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+}
+
+.payment-status-button.pending:hover:not(:disabled) {
+    background: #fff4d8 !important;
+}
+
+.payment-status-button.paid:hover:not(:disabled) {
+    background: #eaf7ee !important;
+}
+
+.payment-status-help {
+    display: block !important;
+
+    margin-top: 10px !important;
+
+    color: #817681 !important;
+
+    font-size: 12px !important;
+}
+
+@media (max-width: 600px) {
+    .payment-status-options {
+        grid-template-columns: 1fr !important;
+    }
+}

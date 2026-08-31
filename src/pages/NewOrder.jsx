@@ -1,5 +1,5 @@
-import { useState } from "react";
 
+import { useState } from "react";
 import { supabase } from "../lib/supabase";
 
 function NewOrder({ onBack, onOrderCreated }) {
@@ -38,6 +38,11 @@ function NewOrder({ onBack, onOrderCreated }) {
     // =====================================================
 
     const [sena, setSena] = useState("");
+    const [pagado, setPagado] = useState(false);
+
+    // =====================================================
+    // GUARDANDO
+    // =====================================================
 
     const [guardando, setGuardando] = useState(false);
 
@@ -49,22 +54,16 @@ function NewOrder({ onBack, onOrderCreated }) {
         switch (tipo) {
             case "Vestido":
                 return "👗";
-
             case "Pantalón":
                 return "👖";
-
             case "Blusa":
                 return "👚";
-
             case "Camisa":
                 return "👔";
-
             case "Saco":
                 return "🧥";
-
             case "Falda":
                 return "👗";
-
             default:
                 return "🧵";
         }
@@ -74,18 +73,14 @@ function NewOrder({ onBack, onOrderCreated }) {
     // MODIFICAR PRENDA
     // =====================================================
 
-    const actualizarPrenda = (
-        id,
-        campo,
-        valor
-    ) => {
+    const actualizarPrenda = (id, campo, valor) => {
         setPrendas((actuales) =>
             actuales.map((prenda) =>
                 prenda.id === id
                     ? {
-                        ...prenda,
-                        [campo]: valor,
-                    }
+                          ...prenda,
+                          [campo]: valor,
+                      }
                     : prenda
             )
         );
@@ -99,7 +94,7 @@ function NewOrder({ onBack, onOrderCreated }) {
         setPrendas((actuales) => [
             ...actuales,
             {
-                id: Date.now(),
+                id: Date.now() + Math.random(),
                 tipoPrenda: "",
                 cantidad: 1,
                 descripcion: "",
@@ -118,10 +113,7 @@ function NewOrder({ onBack, onOrderCreated }) {
         }
 
         setPrendas((actuales) =>
-            actuales.filter(
-                (prenda) =>
-                    prenda.id !== id
-            )
+            actuales.filter((prenda) => prenda.id !== id)
         );
     };
 
@@ -129,10 +121,7 @@ function NewOrder({ onBack, onOrderCreated }) {
     // CAMBIAR CANTIDAD
     // =====================================================
 
-    const cambiarCantidad = (
-        id,
-        cantidad
-    ) => {
+    const cambiarCantidad = (id, cantidad) => {
         const nuevaCantidad = Math.max(
             1,
             Number(cantidad) || 1
@@ -146,26 +135,111 @@ function NewOrder({ onBack, onOrderCreated }) {
     };
 
     // =====================================================
-    // PRECIO TOTAL
+    // TOTAL DEL PEDIDO
     // =====================================================
 
     const precioTotal = prendas.reduce(
         (total, prenda) => {
+            const precioUnitario =
+                Number(prenda.precio) || 0;
+
+            const cantidad =
+                Number(prenda.cantidad) || 1;
+
             return (
                 total +
-                (Number(prenda.precio) || 0)
+                precioUnitario * cantidad
             );
         },
         0
     );
 
     // =====================================================
+    // SEÑA
+    // =====================================================
+
+    const senaNumerica = Number(sena) || 0;
+
+    // =====================================================
     // SALDO
     // =====================================================
 
-    const saldoPendiente =
-        precioTotal -
-        (Number(sena) || 0);
+    const saldoPendiente = pagado
+        ? 0
+        : Math.max(
+              0,
+              precioTotal - senaNumerica
+          );
+
+    // =====================================================
+    // MARCAR PAGADO
+    // =====================================================
+
+    const cambiarEstadoPago = (nuevoEstado) => {
+        if (nuevoEstado === "pagado") {
+            setPagado(true);
+            setSena(String(precioTotal));
+        } else {
+            setPagado(false);
+
+            setSena((valorActual) => {
+                const valor =
+                    Number(valorActual) || 0;
+
+                return valor > precioTotal
+                    ? String(precioTotal)
+                    : valorActual;
+            });
+        }
+    };
+
+    // =====================================================
+    // CUANDO CAMBIA EL TOTAL
+    // =====================================================
+
+    const manejarCambioPrecio = (
+        id,
+        valor
+    ) => {
+        actualizarPrenda(
+            id,
+            "precio",
+            valor
+        );
+
+        if (pagado) {
+            const nuevoPrecioTotal =
+                prendas.reduce(
+                    (total, prenda) => {
+                        const precioActual =
+                            prenda.id === id
+                                ? Number(valor) ||
+                                  0
+                                : Number(
+                                      prenda.precio
+                                  ) || 0;
+
+                        const cantidad =
+                            Number(
+                                prenda.cantidad
+                            ) || 1;
+
+                        return (
+                            total +
+                            precioActual *
+                                cantidad
+                        );
+                    },
+                    0
+                );
+
+            setSena(
+                String(
+                    nuevoPrecioTotal
+                )
+            );
+        }
+    };
 
     // =====================================================
     // CREAR PEDIDO
@@ -226,8 +300,7 @@ function NewOrder({ onBack, onOrderCreated }) {
         const algunPrecioInvalido =
             prendas.some(
                 (prenda) =>
-                    Number(prenda.precio) <
-                    0
+                    Number(prenda.precio) < 0
             );
 
         if (algunPrecioInvalido) {
@@ -237,19 +310,18 @@ function NewOrder({ onBack, onOrderCreated }) {
             return;
         }
 
-        if (
-            Number(sena || 0) < 0
-        ) {
+        const senaFinal = pagado
+            ? precioTotal
+            : senaNumerica;
+
+        if (senaFinal < 0) {
             alert(
                 "La seña no puede ser negativa."
             );
             return;
         }
 
-        if (
-            Number(sena || 0) >
-            precioTotal
-        ) {
+        if (senaFinal > precioTotal) {
             alert(
                 "La seña no puede ser mayor al precio total."
             );
@@ -269,17 +341,16 @@ function NewOrder({ onBack, onOrderCreated }) {
             const {
                 data: clienteExistente,
                 error: errorBusqueda,
-            } =
-                await supabase
-                    .from("clientes")
-                    .select(
-                        "id, nombre, telefono"
-                    )
-                    .eq(
-                        "telefono",
-                        telefonoLimpio
-                    )
-                    .maybeSingle();
+            } = await supabase
+                .from("clientes")
+                .select(
+                    "id, nombre, telefono"
+                )
+                .eq(
+                    "telefono",
+                    telefonoLimpio
+                )
+                .maybeSingle();
 
             if (errorBusqueda) {
                 throw new Error(
@@ -305,19 +376,18 @@ function NewOrder({ onBack, onOrderCreated }) {
                 const {
                     data: nuevoCliente,
                     error: errorCliente,
-                } =
-                    await supabase
-                        .from("clientes")
-                        .insert([
-                            {
-                                nombre:
-                                    nombre.trim(),
-                                telefono:
-                                    telefonoLimpio,
-                            },
-                        ])
-                        .select("id")
-                        .single();
+                } = await supabase
+                    .from("clientes")
+                    .insert([
+                        {
+                            nombre:
+                                nombre.trim(),
+                            telefono:
+                                telefonoLimpio,
+                        },
+                    ])
+                    .select("id")
+                    .single();
 
                 if (errorCliente) {
                     throw new Error(
@@ -339,16 +409,6 @@ function NewOrder({ onBack, onOrderCreated }) {
             // =============================================
             // 4. CREAR PEDIDO GENERAL
             // =============================================
-
-            /*
-             * IMPORTANTE:
-             * Para mantener compatibilidad con tu tabla
-             * actual "pedidos", usamos como tipo_prenda
-             * el primer trabajo.
-             *
-             * El precio y la descripción real están
-             * guardados en "pedido_prendas".
-             */
 
             const primeraPrenda =
                 prendas[0];
@@ -381,7 +441,7 @@ function NewOrder({ onBack, onOrderCreated }) {
                             precioTotal,
 
                         sena:
-                            Number(sena || 0),
+                            senaFinal,
 
                         estado:
                             estado,
@@ -391,6 +451,9 @@ function NewOrder({ onBack, onOrderCreated }) {
 
                         notas:
                             notas.trim(),
+
+                        pagado:
+                            pagado,
                     },
                 ])
                 .select()
@@ -410,7 +473,7 @@ function NewOrder({ onBack, onOrderCreated }) {
             }
 
             // =============================================
-            // 5. CREAR PRENDAS DEL PEDIDO
+            // 5. CREAR PRENDAS
             // =============================================
 
             const prendasParaGuardar =
@@ -444,10 +507,6 @@ function NewOrder({ onBack, onOrderCreated }) {
                 );
 
             if (errorPrendas) {
-                // Si falla la carga de prendas,
-                // eliminamos el pedido recién creado
-                // para evitar dejar información incompleta.
-
                 await supabase
                     .from("pedidos")
                     .delete()
@@ -467,24 +526,27 @@ function NewOrder({ onBack, onOrderCreated }) {
             // =============================================
 
             alert(
-                "¡Pedido creado correctamente! 🧵❤️"
+                pagado
+                    ? "¡Pedido creado y marcado como pagado! 🧵💚"
+                    : "¡Pedido creado correctamente! 🧵❤️"
             );
 
-            // Limpiar formulario
+            // Limpiar
+
             setNombre("");
             setTelefono("");
-
             setFechaEntrega("");
-
             setEstado("En proceso");
             setPrioridad("Normal");
-
             setNotas("");
             setSena("");
+            setPagado(false);
 
             setPrendas([
                 {
-                    id: Date.now(),
+                    id:
+                        Date.now() +
+                        Math.random(),
                     tipoPrenda: "",
                     cantidad: 1,
                     descripcion: "",
@@ -492,13 +554,11 @@ function NewOrder({ onBack, onOrderCreated }) {
                 },
             ]);
 
-            // Actualizar aplicación
             if (onOrderCreated) {
                 await onOrderCreated();
             } else if (onBack) {
                 onBack();
             }
-
         } catch (error) {
             console.error(
                 "Error creando pedido:",
@@ -532,24 +592,20 @@ function NewOrder({ onBack, onOrderCreated }) {
 
     return (
         <div className="new-order-page">
-
             {/* =============================================
                 ENCABEZADO
             ============================================= */}
 
             <div className="page-header">
-
                 <div>
-
                     <h1>
                         Nuevo pedido 🧵
                     </h1>
 
                     <p>
-                        Cargá todos los trabajos de
-                        una misma clienta.
+                        Cargá todos los trabajos
+                        de una misma clienta.
                     </p>
-
                 </div>
 
                 <button
@@ -559,28 +615,23 @@ function NewOrder({ onBack, onOrderCreated }) {
                 >
                     ← Volver
                 </button>
-
             </div>
 
             <form
                 className="order-form"
                 onSubmit={crearPedido}
             >
-
                 {/* =========================================
                     CLIENTE
                 ========================================= */}
 
                 <div className="form-section">
-
                     <h2>
                         👤 Datos del cliente
                     </h2>
 
                     <div className="form-grid">
-
                         <div className="form-group">
-
                             <label>
                                 Nombre del cliente
                             </label>
@@ -591,18 +642,17 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 value={nombre}
                                 onChange={(e) =>
                                     setNombre(
-                                        e.target.value
+                                        e.target
+                                            .value
                                     )
                                 }
                                 disabled={
                                     guardando
                                 }
                             />
-
                         </div>
 
                         <div className="form-group">
-
                             <label>
                                 Teléfono
                             </label>
@@ -613,18 +663,16 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 value={telefono}
                                 onChange={(e) =>
                                     setTelefono(
-                                        e.target.value
+                                        e.target
+                                            .value
                                     )
                                 }
                                 disabled={
                                     guardando
                                 }
                             />
-
                         </div>
-
                     </div>
-
                 </div>
 
                 {/* =========================================
@@ -632,7 +680,6 @@ function NewOrder({ onBack, onOrderCreated }) {
                 ========================================= */}
 
                 <div className="form-section">
-
                     <div
                         className="section-header"
                         style={{
@@ -640,18 +687,16 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 "20px",
                         }}
                     >
-
                         <div>
-
                             <h2>
                                 🧵 Trabajos del pedido
                             </h2>
 
                             <p>
                                 Podés agregar varias
-                                prendas para la misma clienta.
+                                prendas para la misma
+                                clienta.
                             </p>
-
                         </div>
 
                         <button
@@ -666,7 +711,6 @@ function NewOrder({ onBack, onOrderCreated }) {
                         >
                             ＋ Agregar prenda
                         </button>
-
                     </div>
 
                     <div
@@ -678,40 +722,28 @@ function NewOrder({ onBack, onOrderCreated }) {
                             gap: "16px",
                         }}
                     >
-
                         {prendas.map(
                             (
                                 prenda,
                                 index
                             ) => (
-
                                 <div
                                     key={
                                         prenda.id
                                     }
                                     className="garment-card"
                                 >
-
                                     {/* CABECERA */}
 
-                                    <div
-                                        className="garment-header"
-                                    >
-
-                                        <div
-                                            className="garment-title"
-                                        >
-
-                                            <span
-                                                className="garment-icon"
-                                            >
+                                    <div className="garment-header">
+                                        <div className="garment-title">
+                                            <span className="garment-icon">
                                                 {obtenerIcono(
                                                     prenda.tipoPrenda
                                                 )}
                                             </span>
 
                                             <div>
-
                                                 <strong>
                                                     Trabajo{" "}
                                                     {index +
@@ -721,14 +753,11 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                 <small>
                                                     Prenda del pedido
                                                 </small>
-
                                             </div>
-
                                         </div>
 
                                         {prendas.length >
                                             1 && (
-
                                             <button
                                                 type="button"
                                                 className="remove-garment-button"
@@ -744,21 +773,13 @@ function NewOrder({ onBack, onOrderCreated }) {
                                             >
                                                 🗑️
                                             </button>
-
                                         )}
-
                                     </div>
 
                                     {/* CAMPOS */}
 
-                                    <div
-                                        className="form-grid"
-                                    >
-
-                                        <div
-                                            className="form-group"
-                                        >
-
+                                    <div className="form-grid">
+                                        <div className="form-group">
                                             <label>
                                                 Tipo de prenda
                                             </label>
@@ -773,7 +794,8 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                     actualizarPrenda(
                                                         prenda.id,
                                                         "tipoPrenda",
-                                                        e.target
+                                                        e
+                                                            .target
                                                             .value
                                                     )
                                                 }
@@ -782,9 +804,9 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                 }
                                                 required
                                             >
-
                                                 <option value="">
-                                                    Seleccionar prenda
+                                                    Seleccionar
+                                                    prenda
                                                 </option>
 
                                                 <option value="Vestido">
@@ -814,23 +836,15 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                 <option value="Otro">
                                                     🧵 Otro
                                                 </option>
-
                                             </select>
-
                                         </div>
 
-                                        <div
-                                            className="form-group"
-                                        >
-
+                                        <div className="form-group">
                                             <label>
                                                 Cantidad
                                             </label>
 
-                                            <div
-                                                className="quantity-control"
-                                            >
-
+                                            <div className="quantity-control">
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -870,21 +884,12 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                 >
                                                     +
                                                 </button>
-
                                             </div>
-
                                         </div>
-
                                     </div>
 
-                                    <div
-                                        className="form-grid"
-                                    >
-
-                                        <div
-                                            className="form-group"
-                                        >
-
+                                    <div className="form-grid">
+                                        <div className="form-group">
                                             <label>
                                                 Descripción del trabajo
                                             </label>
@@ -901,7 +906,8 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                     actualizarPrenda(
                                                         prenda.id,
                                                         "descripcion",
-                                                        e.target
+                                                        e
+                                                            .target
                                                             .value
                                                     )
                                                 }
@@ -909,15 +915,11 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                     guardando
                                                 }
                                             />
-
                                         </div>
 
-                                        <div
-                                            className="form-group"
-                                        >
-
+                                        <div className="form-group">
                                             <label>
-                                                Precio de esta prenda
+                                                Precio por unidad
                                             </label>
 
                                             <input
@@ -931,10 +933,10 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                 onChange={(
                                                     e
                                                 ) =>
-                                                    actualizarPrenda(
+                                                    manejarCambioPrecio(
                                                         prenda.id,
-                                                        "precio",
-                                                        e.target
+                                                        e
+                                                            .target
                                                             .value
                                                     )
                                                 }
@@ -943,16 +945,31 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                 }
                                             />
 
+                                            <small className="form-help">
+                                                Total de esta
+                                                prenda:{" "}
+                                                <strong>
+                                                    $
+                                                    {(
+                                                        (Number(
+                                                            prenda.precio
+                                                        ) ||
+                                                            0) *
+                                                        (Number(
+                                                            prenda.cantidad
+                                                        ) ||
+                                                            1)
+                                                    ).toLocaleString(
+                                                        "es-AR"
+                                                    )}
+                                                </strong>
+                                            </small>
                                         </div>
-
                                     </div>
-
                                 </div>
                             )
                         )}
-
                     </div>
-
                 </div>
 
                 {/* =========================================
@@ -960,15 +977,12 @@ function NewOrder({ onBack, onOrderCreated }) {
                 ========================================= */}
 
                 <div className="form-section">
-
                     <h2>
                         📅 Entrega
                     </h2>
 
                     <div className="form-grid">
-
                         <div className="form-group">
-
                             <label>
                                 Fecha de entrega
                             </label>
@@ -980,7 +994,8 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 }
                                 onChange={(e) =>
                                     setFechaEntrega(
-                                        e.target.value
+                                        e.target
+                                            .value
                                     )
                                 }
                                 disabled={
@@ -988,11 +1003,8 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 }
                                 required
                             />
-
                         </div>
-
                     </div>
-
                 </div>
 
                 {/* =========================================
@@ -1000,15 +1012,12 @@ function NewOrder({ onBack, onOrderCreated }) {
                 ========================================= */}
 
                 <div className="form-section">
-
                     <h2>
                         💰 Información de pago
                     </h2>
 
                     <div className="payment-summary">
-
                         <div className="payment-summary-item">
-
                             <span>
                                 Total del pedido
                             </span>
@@ -1019,11 +1028,9 @@ function NewOrder({ onBack, onOrderCreated }) {
                                     "es-AR"
                                 )}
                             </strong>
-
                         </div>
 
                         <div className="payment-summary-item">
-
                             <span>
                                 Seña
                             </span>
@@ -1034,20 +1041,32 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 step="0.01"
                                 placeholder="$ 0"
                                 value={sena}
-                                onChange={(e) =>
-                                    setSena(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => {
+                                    const valor =
+                                        e.target
+                                            .value;
+
+                                    setSena(valor);
+
+                                    if (
+                                        Number(
+                                            valor
+                                        ) <
+                                            precioTotal
+                                    ) {
+                                        setPagado(
+                                            false
+                                        );
+                                    }
+                                }}
                                 disabled={
-                                    guardando
+                                    guardando ||
+                                    pagado
                                 }
                             />
-
                         </div>
 
                         <div className="payment-summary-item">
-
                             <span>
                                 Saldo pendiente
                             </span>
@@ -1065,11 +1084,62 @@ function NewOrder({ onBack, onOrderCreated }) {
                                     "es-AR"
                                 )}
                             </strong>
-
                         </div>
-
                     </div>
 
+                    {/* ESTADO DE PAGO */}
+
+                    <div className="payment-status-container">
+                        <span className="payment-status-label">
+                            Estado del pago
+                        </span>
+
+                        <div className="payment-status-options">
+                            <button
+                                type="button"
+                                className={
+                                    !pagado
+                                        ? "payment-status-button pending active"
+                                        : "payment-status-button pending"
+                                }
+                                onClick={() =>
+                                    cambiarEstadoPago(
+                                        "pendiente"
+                                    )
+                                }
+                                disabled={
+                                    guardando
+                                }
+                            >
+                                ⏳ Pago pendiente
+                            </button>
+
+                            <button
+                                type="button"
+                                className={
+                                    pagado
+                                        ? "payment-status-button paid active"
+                                        : "payment-status-button paid"
+                                }
+                                onClick={() =>
+                                    cambiarEstadoPago(
+                                        "pagado"
+                                    )
+                                }
+                                disabled={
+                                    guardando
+                                }
+                            >
+                                ✅ Pagado
+                            </button>
+                        </div>
+
+                        <small className="payment-status-help">
+                            El estado del pago es
+                            independiente del estado
+                            del trabajo.
+                        </small>
+                    </div>
                 </div>
 
                 {/* =========================================
@@ -1077,15 +1147,12 @@ function NewOrder({ onBack, onOrderCreated }) {
                 ========================================= */}
 
                 <div className="form-section">
-
                     <h2>
                         📌 Estado del pedido
                     </h2>
 
                     <div className="form-grid">
-
                         <div className="form-group">
-
                             <label>
                                 Estado
                             </label>
@@ -1094,14 +1161,14 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 value={estado}
                                 onChange={(e) =>
                                     setEstado(
-                                        e.target.value
+                                        e.target
+                                            .value
                                     )
                                 }
                                 disabled={
                                     guardando
                                 }
                             >
-
                                 <option value="En proceso">
                                     🟡 En proceso
                                 </option>
@@ -1113,13 +1180,10 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 <option value="Entregado">
                                     ⚪ Entregado
                                 </option>
-
                             </select>
-
                         </div>
 
                         <div className="form-group">
-
                             <label>
                                 Prioridad
                             </label>
@@ -1128,14 +1192,14 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 value={prioridad}
                                 onChange={(e) =>
                                     setPrioridad(
-                                        e.target.value
+                                        e.target
+                                            .value
                                     )
                                 }
                                 disabled={
                                     guardando
                                 }
                             >
-
                                 <option value="Normal">
                                     🟢 Normal
                                 </option>
@@ -1143,15 +1207,11 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 <option value="Urgente">
                                     🔴 Urgente
                                 </option>
-
                             </select>
-
                         </div>
-
                     </div>
 
                     <div className="form-group">
-
                         <label>
                             Notas generales
                         </label>
@@ -1162,16 +1222,15 @@ function NewOrder({ onBack, onOrderCreated }) {
                             value={notas}
                             onChange={(e) =>
                                 setNotas(
-                                    e.target.value
+                                    e.target
+                                        .value
                                 )
                             }
                             disabled={
                                 guardando
                             }
                         />
-
                     </div>
-
                 </div>
 
                 {/* =========================================
@@ -1179,7 +1238,6 @@ function NewOrder({ onBack, onOrderCreated }) {
                 ========================================= */}
 
                 <div className="form-actions">
-
                     <button
                         type="button"
                         className="cancel-button"
@@ -1202,9 +1260,7 @@ function NewOrder({ onBack, onOrderCreated }) {
                             ? "Guardando..."
                             : "✓ Crear pedido"}
                     </button>
-
                 </div>
-
             </form>
         </div>
     );
