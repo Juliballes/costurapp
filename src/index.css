@@ -1,7 +1,7 @@
 
 /* =========================================================
    COSTURAPP - ESTILOS GLOBALES
-   Diseño soft / moderno / legible / responsive
+   Dise├▒o soft / moderno / legible / responsive
 ========================================================= */
 
 :root {
@@ -457,7 +457,7 @@ textarea {
 }
 
 /* =========================================================
-   DASHBOARD - ESTADÍSTICAS
+   DASHBOARD - ESTAD├ìSTICAS
 ========================================================= */
 
 .dashboard-stats {
@@ -1093,7 +1093,7 @@ textarea {
 }
 
 /* =========================================================
-   PRÓXIMOS PEDIDOS
+   PR├ôXIMOS PEDIDOS
 ========================================================= */
 
 .upcoming-panel {
@@ -1234,7 +1234,7 @@ textarea {
 }
 
 /* =========================================================
-   DASHBOARD - VACÍO
+   DASHBOARD - VAC├ìO
 ========================================================= */
 
 .dashboard-empty-state {
@@ -1371,7 +1371,7 @@ textarea {
 }
 
 /* =========================================================
-   PEDIDOS - PÁGINA
+   PEDIDOS - P├üGINA
 ========================================================= */
 
 .orders-page {
@@ -2740,7 +2740,7 @@ textarea {
 }
 
 /* =========================================================
-   MÚLTIPLES PRENDAS
+   M├ÜLTIPLES PRENDAS
 ========================================================= */
 
 .garment-card {
@@ -3980,7 +3980,7 @@ textarea {
     font-size: 13px;
 }
 
-/* BOTÓN EDITAR CALENDARIO */
+/* BOT├ôN EDITAR CALENDARIO */
 
 .calendar-sidebar .edit-order-button {
     width: 100%;
@@ -4951,7 +4951,7 @@ textarea {
     }
 }
 /* =========================================================
-   CORRECCIÓN DE ALINEACIÓN DE PÁGINAS
+   CORRECCI├ôN DE ALINEACI├ôN DE P├üGINAS
    Pedidos / Calendario / Nuevo Pedido / Detalle
 ========================================================= */
 
@@ -5191,7 +5191,7 @@ textarea {
     }
 }
 /* =========================================================
-   ESTADO DE PAGO - CORRECCIÓN
+   ESTADO DE PAGO - CORRECCI├ôN
 ========================================================= */
 
 .payment-status-container {
@@ -5314,5 +5314,190 @@ textarea {
 @media (max-width: 600px) {
     .payment-status-options {
         grid-template-columns: 1fr !important;
+    }
+}
+
+/* SOLAPAS DE PEDIDOS */
+
+.orders-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px;
+    margin: 18px 0;
+    background: #ffffff;
+    border: 1px solid #f0dce5;
+    border-radius: 14px;
+}
+
+.orders-tab {
+    padding: 11px 18px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #765b68;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.orders-tab:hover {
+    background: #fff4f8;
+}
+
+.orders-tab.active {
+    background: #f7e7ef;
+    color: #b6537c;
+}
+
+/* TOTAL SEMANAL A COBRAR */
+
+.weekly-collection-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 22px 0;
+    padding: 22px;
+    border: 1px solid #f0dce5;
+    border-radius: 18px;
+    background: #fffafc;
+}
+
+.weekly-collection-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    background: #f7e7ef;
+    font-size: 28px;
+}
+
+.weekly-collection-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.weekly-collection-info span {
+    color: #765b68;
+    font-size: 14px;
+}
+
+.weekly-collection-info strong {
+    color: #a94f73;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.weekly-collection-info small {
+    color: #806f77;
+    font-size: 12px;
+}
+
+/* ACCIONES DE LAS TARJETAS */
+
+.order-card-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+}
+
+.whatsapp-order-button {
+    padding: 9px 12px;
+    border: 1px solid #c6dfc7;
+    border-radius: 9px;
+    background: #eef8ee;
+    color: #286c3b;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.whatsapp-order-button:hover {
+    background: #dff1df;
+}
+
+@media (max-width: 700px) {
+    .orders-tabs {
+        flex-direction: column;
+    }
+
+    .orders-tab {
+        width: 100%;
+    }
+
+    .weekly-collection-card {
+        align-items: flex-start;
+        padding: 16px;
+    }
+
+    .weekly-collection-info strong {
+        font-size: 24px;
+    }
+
+    .order-card-actions {
+        width: 100%;
+    }
+}
+/* =========================================================
+   GANANCIAS - CORRECCI├ôN DEL N├ÜMERO QUE SE DESBORDA
+========================================================= */
+
+.weekly-collection-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    gap: 14px;
+    overflow: hidden;
+}
+
+.weekly-collection-icon {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+}
+
+.weekly-collection-info {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.weekly-collection-info span,
+.weekly-collection-info small {
+    overflow-wrap: anywhere;
+}
+
+.weekly-collection-info strong {
+    display: block;
+    max-width: 100%;
+    font-size: clamp(18px, 2vw, 28px);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+    .weekly-collection-card {
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .weekly-collection-icon {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
+        font-size: 22px;
+    }
+
+    .weekly-collection-info strong {
+        font-size: clamp(17px, 5vw, 23px);
     }
 }
