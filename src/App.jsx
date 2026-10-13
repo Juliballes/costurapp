@@ -6,6 +6,7 @@ import Orders from "./pages/Orders";
 import Layout from "./components/Layout";
 
 import { supabase } from "./lib/supabase";
+import Earnings from "./pages/Earnings";
 
 function App() {
     const [page, setPage] = useState("dashboard");
@@ -437,6 +438,15 @@ function App() {
             </Layout>
         );
     }
+    
+    if (page === "earnings") {
+        return (
+            <Layout page="earnings" setPage={setPage}>
+                <Earnings pedidos={pedidos} />
+            </Layout>
+        );
+    }
+
 
     // =====================================================
     // DASHBOARD

@@ -51,6 +51,15 @@ function Layout({ page, setPage, children }) {
                         <span className="menu-icon">📅</span>
                         <span>Calendario</span>
                     </button>
+                    
+                    <button
+                        className={`menu-button ${page === "earnings" ? "active" : ""}`}
+                        onClick={() => setPage("earnings")}
+                    >
+                        <span className="menu-icon">💰</span>
+                        <span>Ganancias</span>
+                    </button>
+
 
                 </nav>
 

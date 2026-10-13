@@ -5501,3 +5501,92 @@ textarea {
         font-size: clamp(17px, 5vw, 23px);
     }
 }
+
+/* Ganancias: evitar desbordamientos de textos e importes */
+
+.earnings-page,
+.earnings-page * {
+    box-sizing: border-box;
+}
+
+.earnings-page {
+    width: 100%;
+    min-width: 0;
+}
+
+.earnings-page .weekly-collection-card,
+.earnings-page .dashboard-stat-card,
+.earnings-page .dashboard-panel {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.earnings-page .weekly-collection-info,
+.earnings-page .dashboard-stat-card > div:last-child {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.earnings-page .weekly-collection-info span,
+.earnings-page .weekly-collection-info small,
+.earnings-page .dashboard-stat-card span,
+.earnings-page .dashboard-stat-card small {
+    overflow-wrap: anywhere;
+}
+
+.earnings-page .weekly-collection-info strong,
+.earnings-page .dashboard-stat-card strong,
+.earnings-page .order-payment strong {
+    display: block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    font-variant-numeric: tabular-nums;
+}
+
+.earnings-page .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+}
+
+.earnings-page .order-card-new {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.earnings-page .order-main-info,
+.earnings-page .order-payment {
+    min-width: 0;
+}
+
+.earnings-page .order-payment > div {
+    min-width: 0;
+}
+
+.earnings-page .earnings-date-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+}
+
+.earnings-page .earnings-date-selector input {
+    width: 100%;
+    max-width: 280px;
+    min-width: 0;
+}
+
+@media (max-width: 600px) {
+    .earnings-page .dashboard-stats {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .earnings-page .dashboard-stat-card strong,
+    .earnings-page .weekly-collection-info strong {
+        font-size: clamp(16px, 5vw, 23px);
+    }
+
+    .earnings-page .order-payment {
+        width: 100%;
+    }
+}
