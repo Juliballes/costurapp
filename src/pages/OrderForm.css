@@ -128,3 +128,119 @@
         min-height: 46px;
     }
 }
+
+.order-fields {
+    border: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-section-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.form-section-heading h2 {
+    margin-bottom: 8px;
+}
+
+.section-help {
+    color: #756670;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.garments-editor {
+    display: grid;
+    gap: 16px;
+}
+
+.field-error {
+    display: block;
+    color: #a92e42;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.order-form [aria-invalid="true"] {
+    border-color: #b82d48;
+    background: #fff7f8;
+}
+
+.form-error-banner,
+.form-success-banner,
+.connection-notice {
+    padding: 16px 20px;
+    border: 1px solid #ebbbc5;
+    border-radius: 13px;
+    background: #fff2f5;
+    color: #912b40;
+    overflow-wrap: anywhere;
+}
+
+.form-success-banner {
+    border-color: #b2d7c0;
+    background: #edf8f1;
+    color: #306247;
+}
+
+.payment-summary-item label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 7px;
+    color: #756670;
+}
+
+.settings-preview {
+    padding: 20px;
+    background: #edf6ef;
+    border: 1px solid #d3e6d8;
+    border-radius: 14px;
+}
+
+.settings-preview h3 {
+    font-size: 13px;
+    margin-bottom: 12px;
+    color: #496452;
+}
+
+.settings-preview p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.connection-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.connection-notice button {
+    background: white;
+    color: #912b40;
+    padding: 10px 14px;
+    border: 1px solid #e4b5c0;
+    border-radius: 9px;
+}
+
+.connection-empty {
+    padding: 50px 24px;
+    text-align: center;
+    background: white;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}
+
+.connection-empty p {
+    margin-top: 12px;
+    color: #756670;
+}

@@ -2407,3 +2407,13 @@
     max-height: calc(100dvh - 32px);
     overflow-y: auto;
 }
+
+.order-actions .whatsapp-order-button {
+    min-height: 40px;
+    padding: 10px 14px;
+    border: 1px solid #a6d6b8;
+    border-radius: 10px;
+    background: #edf8f1;
+    color: #286140;
+    font-weight: 650;
+}

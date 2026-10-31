@@ -1,6 +1,9 @@
 import "./Layout.css";
+import { useWorkshopSettings } from "../hooks/useWorkshopSettings";
+import "../pages/OrderForm.css";
 
-function Layout({ page, setPage, children }) {
+function Layout({ page, setPage, children, errorCarga, onRetry }) {
+    const configuracion = useWorkshopSettings();
     return (
         <div className="app-layout">
 
@@ -15,7 +18,7 @@ function Layout({ page, setPage, children }) {
 
                     <div className="logo-text">
                         <h2>CosturApp</h2>
-                        <span>Mhome · Taller de costura</span>
+                        <span>{configuracion.taller} · Taller de costura</span>
                     </div>
                 </div>
 
@@ -61,20 +64,22 @@ function Layout({ page, setPage, children }) {
                     </button>
 
 
-                </nav>
-
-                {/* PARTE INFERIOR */}
-                <div className="sidebar-bottom">
-
                     <button
                         className={`menu-button ${
                             page === "settings" ? "active" : ""
                         }`}
+                        aria-label="⚙️ Configuración"
                         onClick={() => setPage("settings")}
                     >
                         <span className="menu-icon">⚙️</span>
-                        <span>Configuración</span>
+                        <span className="config-nav-full">Configuración</span>
+                        <span className="config-nav-short">Ajustes</span>
                     </button>
+
+                </nav>
+
+                {/* PARTE INFERIOR */}
+                <div className="sidebar-bottom">
 
                     <div className="sidebar-footer">
                         <div className="footer-icon">
@@ -95,6 +100,7 @@ function Layout({ page, setPage, children }) {
                 CONTENIDO
             ========================= */}
             <main className="main-content">
+                {errorCarga && <div className="connection-notice" role="alert"><span>{errorCarga}</span><button type="button" onClick={onRetry}>Reintentar</button></div>}
                 {children}
             </main>
 

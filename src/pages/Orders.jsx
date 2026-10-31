@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { resumenPago, subtotalPrenda } from "../lib/orderTotals";
-import { mensajeRetiro } from "../lib/whatsapp";
+import { mensajeRetiro, enlaceWhatsapp } from "../lib/whatsapp";
+import { coincideBusqueda } from "../lib/orderDraft";
+import { useWorkshopSettings } from "../hooks/useWorkshopSettings";
 
 import EditOrder from "./EditOrder";
 import OrderDetail from "./OrderDetail";
@@ -16,6 +18,7 @@ function Orders({
     onRefresh,
     filtroInicial = "Todos",
 }) {
+    const configuracion = useWorkshopSettings();
     const [busqueda, setBusqueda] = useState("");
     const [filtroEstado, setFiltroEstado] =
         useState("Todos");
@@ -188,46 +191,7 @@ function Orders({
     // WHATSAPP
     // =====================================================
 
-    const obtenerNumeroWhatsapp = (telefono) => {
-        let numero = String(
-            telefono || ""
-        ).replace(/\D/g, "");
-
-        if (!numero) {
-            return null;
-        }
-
-        if (numero.startsWith("00")) {
-            numero = numero.slice(2);
-        }
-
-        if (!numero.startsWith("54")) {
-            numero = numero
-                .replace(/^0/, "")
-                .replace(/^15/, "");
-
-            numero = `549${numero}`;
-        }
-
-        return numero;
-    };
-
-    const crearEnlaceWhatsapp = (pedido) => {
-        const numero =
-            obtenerNumeroWhatsapp(
-                pedido?.clientes?.telefono
-            );
-
-        if (!numero) {
-            return null;
-        }
-
-        const mensaje = mensajeRetiro(pedido?.clientes?.nombre);
-
-        return `https://wa.me/${numero}?text=${encodeURIComponent(
-            mensaje
-        )}`;
-    };
+    const crearEnlaceWhatsapp = pedido => enlaceWhatsapp(pedido, configuracion);
 
     // =====================================================
     // ELIMINAR
@@ -299,28 +263,7 @@ function Orders({
     const pedidosFiltrados =
     pedidos.filter((pedido) => {
 
-        const texto =
-            busqueda
-                .toLowerCase()
-                .trim();
-
-        const nombre =
-            pedido.clientes
-                ?.nombre
-                ?.toLowerCase() || "";
-
-        const tipo =
-            pedido.tipo_prenda
-                ?.toLowerCase() || "";
-
-        const descripcion =
-            pedido.descripcion
-                ?.toLowerCase() || "";
-
-        const coincideTexto =
-            nombre.includes(texto) ||
-            tipo.includes(texto) ||
-            descripcion.includes(texto);
+        const coincideTexto = coincideBusqueda(pedido, busqueda);
 
         const coincideEstado =
             filtroEstado === "Todos" ||
@@ -615,7 +558,7 @@ function Orders({
 
                     <input
                         type="text"
-                        placeholder="Buscar por cliente, prenda o descripción..."
+                        placeholder="Buscar por cliente, teléfono, prenda o descripción..."
                         value={busqueda}
                         onChange={(e) =>
                             setBusqueda(
@@ -961,6 +904,8 @@ function Orders({
 
                                             )}
 
+                                        {pedido.estado === "Listo" && <button type="button" className="whatsapp-order-button" onClick={() => setPedidoListo(pedido)}>💬 Avisar por WhatsApp</button>}
+
                                         <button
                                             type="button"
                                             className="view-order-button"
@@ -1029,6 +974,7 @@ function Orders({
 
                     <section
                         className="status-modal ready-modal"
+                        aria-label="Aviso de retiro"
                         role="dialog"
                         aria-modal="true"
                         onClick={(event) =>
@@ -1055,7 +1001,7 @@ function Orders({
 
                         <div className="whatsapp-preview">
                             <span>Mensaje para tu cliente</span>
-                            <p>{mensajeRetiro(pedidoListo.clientes?.nombre)}</p>
+                            <p>{mensajeRetiro(pedidoListo.clientes?.nombre, configuracion)}</p>
                         </div>
 
                         {crearEnlaceWhatsapp(
@@ -1082,8 +1028,7 @@ function Orders({
                                 </span>
 
                                 <p>
-                                    Este cliente no tiene
-                                    teléfono cargado.
+                                    Este cliente no tiene un teléfono válido. Corregilo desde Editar pedido para poder avisarle.
                                 </p>
 
                             </div>
