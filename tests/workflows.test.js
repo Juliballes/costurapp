@@ -208,7 +208,7 @@ test("pedidos antiguos se pueden editar sin perder su precio ni descripción", (
     assert.deepEqual(validarBorrador(datos), {});
 });
 
-test("la plantilla respeta nombres con $ y conserva emojis y saltos", () => {
+test("la plantilla respeta nombres con $ y conserva saltos sin emojis", () => {
     const config = {
         ...configuracionInicial,
         taller: "Taller $&",
@@ -218,7 +218,7 @@ test("la plantilla respeta nombres con $ y conserva emojis y saltos", () => {
     assert.deepEqual(validarConfiguracion(config), {});
     assert.equal(
         prepararMensaje("Ana $1", config),
-        "Hola Ana $1\nSoy Sol de Taller $& 🥰",
+        "Hola Ana $1\nSoy Sol de Taller $&",
     );
     assert.ok(validarConfiguracion({ ...config, plantilla: "Hola" }).plantilla);
     assert.ok(

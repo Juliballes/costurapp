@@ -1458,3 +1458,35 @@ body {
 .atelier-layout .legend-dot.pending { background: #93a879; }
 .atelier-layout .legend-dot.urgent { background: #a85a45; }
 .atelier-layout .legend-dot.neutral { background: #c6ccbe; }
+
+.atelier-layout .whatsapp-preview label {
+    display: block;
+    margin-bottom: 10px;
+    color: #496452;
+    font-size: 12px;
+    font-weight: 700;
+}
+.atelier-layout .whatsapp-preview textarea {
+    width: 100%;
+    min-height: 190px;
+    padding: 13px;
+    border: 1px solid #bdcdb3;
+    border-radius: 10px;
+    background: #fffefa;
+    color: #354537;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.65;
+    resize: vertical;
+}
+.atelier-layout .whatsapp-preview textarea:focus {
+    outline: 2px solid #8ba98d;
+    outline-offset: 2px;
+}
+.atelier-layout .message-edit-help {
+    margin: 9px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #69765e;
+}
+.atelier-layout .whatsapp-button:disabled { opacity: .45; cursor: not-allowed; }

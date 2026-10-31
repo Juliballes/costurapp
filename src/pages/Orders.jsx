@@ -1,7 +1,7 @@
 import Icon, { GarmentIcon } from "../components/Icon";
 import { useState } from "react";
 import { resumenPago, subtotalPrenda } from "../lib/orderTotals";
-import { mensajeRetiro, enlaceWhatsapp } from "../lib/whatsapp";
+import WhatsAppMessage from "../components/WhatsAppMessage";
 import { coincideBusqueda } from "../lib/orderDraft";
 import { useWorkshopSettings } from "../hooks/useWorkshopSettings";
 
@@ -168,8 +168,6 @@ function Orders({
     // =====================================================
     // WHATSAPP
     // =====================================================
-
-    const crearEnlaceWhatsapp = pedido => enlaceWhatsapp(pedido, configuracion);
 
     // =====================================================
     // ELIMINAR
@@ -977,41 +975,7 @@ function Orders({
                             ya está listo para retirar.
                         </p>
 
-                        <div className="whatsapp-preview">
-                            <span>Mensaje para tu cliente</span>
-                            <p>{mensajeRetiro(pedidoListo.clientes?.nombre, configuracion)}</p>
-                        </div>
-
-                        {crearEnlaceWhatsapp(
-                            pedidoListo
-                        ) ? (
-
-                            <a
-                                className="whatsapp-button"
-                                href={crearEnlaceWhatsapp(
-                                    pedidoListo
-                                )}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <Icon name="message" /> Avisar por WhatsApp
-                            </a>
-
-                        ) : (
-
-                            <div className="no-phone-message">
-
-                                <span>
-                                    <Icon name="phone" />
-                                </span>
-
-                                <p>
-                                    Este cliente no tiene un teléfono válido. Corregilo desde Editar pedido para poder avisarle.
-                                </p>
-
-                            </div>
-
-                        )}
+                        <WhatsAppMessage pedido={pedidoListo} configuracion={configuracion} />
 
                         <button
                             type="button"
