@@ -84,3 +84,22 @@ La validación automatizada cubre reglas de negocio y persistencia con una base 
 Los mensajes se preparan sin emojis, incluyendo las plantillas guardadas con el formato anterior. Se conservan el nombre del taller, el remitente, el texto personalizado y los saltos de línea. También se eliminan los caracteres de reemplazo `�` de plantillas antiguas.
 
 La vista previa es un campo editable: al escribir, el enlace de WhatsApp se actualiza con ese texto exacto. La edición corresponde solo al aviso abierto y no cambia la plantilla de Configuración. Cerrar el diálogo y volver a abrirlo recupera la plantilla. Un mensaje vacío deja deshabilitada la apertura de WhatsApp. El enlace usa la dirección directa de WhatsApp y codifica el texto una sola vez.
+
+## Pedidos activos e historial
+
+Pedidos tiene dos solapas:
+
+- **Activos**: Pendiente, En proceso y Listo. Un trabajo pagado sigue activo hasta que se entregue.
+- **Antiguos**: únicamente los pedidos con estado Entregado. Conservan cliente, prendas, importes, notas y saldo.
+
+Marcar listo prepara el aviso editable de WhatsApp. **Marcar entregado** pide confirmar que la prenda ya fue retirada y mueve el pedido a Antiguos. **Reactivar** lo devuelve a Activos con estado En proceso. Ninguna de estas acciones cobra, marca como pagado ni modifica la seña. Los pedidos entregados con saldo continúan mostrando esa deuda y siguen incluidos en Ganancias según su fecha prevista.
+
+La vista diaria prioriza atrasados, entregas de hoy y urgentes; también permite ordenar por fecha prevista o cliente. El historial muestra primero las fechas previstas recientes: no representa una fecha real de retiro, que la base actual no registra.
+
+Búsqueda, estado, prioridad, pago y fecha se pueden combinar. Al cambiar de solapa se reinician los filtros de estado, fecha y pago; se conserva la búsqueda escrita para consultar el historial de un cliente. Limpiar filtros también borra esa búsqueda. En celular, Filtros y orden permite desplegar las opciones adicionales.
+
+La lista muestra 10 pedidos por página. Buscar o cambiar filtros vuelve a la primera página. La carga consulta todas las páginas de Supabase para que un historial largo no oculte trabajos activos después de las primeras 1000 filas. Si falla una página, se conserva la última carga completa.
+
+Las tarjetas muestran cliente y estado, trabajos, entrega prevista e importes antes de las acciones. Eliminar queda dentro de Más opciones y mantiene su confirmación; no es necesario borrar un pedido para sacarlo de Activos. Los accesos de Inicio a Urgentes, En proceso, Listos, Hoy y Atrasados abren sus filtros correspondientes.
+
+Para verificar: abrir un pedido Listo con seña parcial, confirmar la entrega y comprobar que pasa a Antiguos con el mismo saldo. Reactivarlo y comprobar que vuelve a Activos. Repetir cambiando el estado desde Editar, buscar en ambas solapas, filtrar por saldo y probar la paginación. Los diálogos admiten Escape para cancelar y las solapas se recorren con las flechas del teclado.

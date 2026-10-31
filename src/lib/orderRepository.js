@@ -5,6 +5,22 @@ import { totalPrendas } from "./orderTotals.js";
 export const seleccionPedido =
     "id,tipo_prenda,descripcion,fecha_entrega,precio,sena,estado,prioridad,notas,pagado,clientes(id,nombre,telefono),pedido_prendas(id,tipo_prenda,cantidad,descripcion,precio)";
 
+// El historial no debe hacer que desaparezcan activos al alcanzar el límite de una consulta.
+export async function cargarTodosLosPedidos(db) {
+    const pedidos = [];
+    for (let inicio = 0; ; inicio += 500) {
+        const { data, error } = await db
+            .from("pedidos")
+            .select(seleccionPedido)
+            .order("fecha_entrega", { ascending: true })
+            .order("id", { ascending: true })
+            .range(inicio, inicio + 499);
+        if (error) throw error;
+        pedidos.push(...data);
+        if (data.length < 500) return pedidos;
+    }
+}
+
 export class ErrorFormulario extends Error {
     constructor(message, campo) {
         super(message);

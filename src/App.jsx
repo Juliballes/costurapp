@@ -11,7 +11,7 @@ import Earnings from "./pages/Earnings";
 import Settings from "./pages/Settings";
 import { navegar } from "./lib/navigation";
 import { useWorkshopSettings } from "./hooks/useWorkshopSettings";
-import { seleccionPedido } from "./lib/orderRepository";
+import { cargarTodosLosPedidos } from "./lib/orderRepository";
 
 function App() {
     const configuracion = useWorkshopSettings();
@@ -35,11 +35,9 @@ function App() {
 
     const cargarPedidos = () => {
         const numeroCarga = ++ultimaCarga.current;
-        return supabase.from("pedidos").select(seleccionPedido)
-            .order("fecha_entrega", { ascending: true })
-            .then(({ data, error }) => {
+        return cargarTodosLosPedidos(supabase)
+            .then((data) => {
                 if (numeroCarga !== ultimaCarga.current) return;
-                if (error) throw error;
                 setPedidos(data || []);
                 setErrorCarga("");
             })
@@ -51,6 +49,12 @@ function App() {
             .finally(() => {
                 if (numeroCarga === ultimaCarga.current) setCargandoPedidos(false);
             });
+    };
+
+    const actualizarPedidoLocal = (actualizado) => {
+        setPedidos(actuales => actualizado.eliminado
+            ? actuales.filter(pedido => pedido.id !== actualizado.id)
+            : actuales.map(pedido => pedido.id === actualizado.id ? { ...pedido, ...actualizado } : pedido));
     };
 
     const reintentarCarga = () => {
@@ -313,86 +317,21 @@ function App() {
         );
     }
 
-    if (
-        page === "orders-late"
-    ) {
+    if (page === "orders" || page.startsWith("orders-")) {
+        const entradas = {
+            "orders-late": { fecha: "Atrasados" },
+            "orders-today": { fecha: "Hoy" },
+            "orders-ready": { estado: "Listo" },
+            "orders-work": { estado: "En proceso" },
+            "orders-urgent": { prioridad: "Urgente" },
+        };
+        const entrada = entradas[page] || {};
         return (
-            <Layout errorCarga={errorCarga} onRetry={reintentarCarga}
-                page="orders"
-                setPage={setPage}
-            >
-                <Orders key={versionNavegacion}
-                    pedidos={pedidos}
-                    onBack={() =>
-                        setPage(
-                            "dashboard"
-                        )
-                    }
-                    onNewOrder={() =>
-                        setPage(
-                            "new-order"
-                        )
-                    }
-                    onRefresh={
-                        cargarPedidos
-                    }
-                    filtroInicial="Atrasados"
-                />
-            </Layout>
-        );
-    }
-
-    if (
-        page === "orders-today"
-    ) {
-        return (
-            <Layout errorCarga={errorCarga} onRetry={reintentarCarga}
-                page="orders"
-                setPage={setPage}
-            >
-                <Orders key={versionNavegacion}
-                    pedidos={pedidos}
-                    onBack={() =>
-                        setPage(
-                            "dashboard"
-                        )
-                    }
-                    onNewOrder={() =>
-                        setPage(
-                            "new-order"
-                        )
-                    }
-                    onRefresh={
-                        cargarPedidos
-                    }
-                    filtroInicial="Hoy"
-                />
-            </Layout>
-        );
-    }
-
-    if (page === "orders") {
-        return (
-            <Layout errorCarga={errorCarga} onRetry={reintentarCarga}
-                page="orders"
-                setPage={setPage}
-            >
-                <Orders key={versionNavegacion}
-                    pedidos={pedidos}
-                    onBack={() =>
-                        setPage(
-                            "dashboard"
-                        )
-                    }
-                    onNewOrder={() =>
-                        setPage(
-                            "new-order"
-                        )
-                    }
-                    onRefresh={
-                        cargarPedidos
-                    }
-                />
+            <Layout errorCarga={errorCarga} onRetry={reintentarCarga} page="orders" setPage={setPage}>
+                <Orders key={`${page}-${versionNavegacion}`} pedidos={pedidos}
+                    onBack={() => setPage("dashboard")} onNewOrder={() => setPage("new-order")}
+                    onRefresh={cargarPedidos} onOrderChanged={actualizarPedidoLocal}
+                    filtroInicial={entrada.fecha || "Todos"} estadoInicial={entrada.estado || "Todos"} prioridadInicial={entrada.prioridad || "Todos"} />
             </Layout>
         );
     }
@@ -465,7 +404,7 @@ function App() {
                         type="button"
                         className="dashboard-stat-card urgent"
                         onClick={() =>
-                            setPage("orders")
+                            setPage("orders-urgent")
                         }
                     >
 
@@ -527,7 +466,7 @@ function App() {
                         type="button"
                         className="dashboard-stat-card process"
                         onClick={() =>
-                            setPage("orders")
+                            setPage("orders-work")
                         }
                     >
 
@@ -557,7 +496,7 @@ function App() {
                         type="button"
                         className="dashboard-stat-card ready"
                         onClick={() =>
-                            setPage("orders")
+                            setPage("orders-ready")
                         }
                     >
 
@@ -978,7 +917,7 @@ function App() {
                                         type="button"
                                         onClick={() =>
                                             setPage(
-                                                "orders"
+                                                "orders-urgent"
                                             )
                                         }
                                     >
@@ -998,7 +937,7 @@ function App() {
                                         type="button"
                                         onClick={() =>
                                             setPage(
-                                                "orders"
+                                                "orders-ready"
                                             )
                                         }
                                     >

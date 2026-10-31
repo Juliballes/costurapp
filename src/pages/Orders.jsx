@@ -1,1081 +1,761 @@
-import Icon, { GarmentIcon } from "../components/Icon";
-import { useState } from "react";
-import { resumenPago, subtotalPrenda } from "../lib/orderTotals";
+import { useRef, useState } from "react";
+import Icon from "../components/Icon";
+import OrganizedOrderCard from "../components/OrganizedOrderCard";
+import OrderDialog from "../components/OrderDialog";
 import WhatsAppMessage from "../components/WhatsAppMessage";
-import { coincideBusqueda } from "../lib/orderDraft";
-import { useWorkshopSettings } from "../hooks/useWorkshopSettings";
-
 import EditOrder from "./EditOrder";
 import OrderDetail from "./OrderDetail";
-
 import { supabase } from "../lib/supabase";
-
+import { seleccionPedido } from "../lib/orderRepository";
+import {
+    esAntiguo,
+    organizarPedidos,
+    resumenOrganizacion,
+} from "../lib/orderOrganization";
+import { formatearDinero, resumenPago } from "../lib/orderTotals";
+import { useWorkshopSettings } from "../hooks/useWorkshopSettings";
 import "./Orders.css";
+import "./OrdersOrganization.css";
 
-function Orders({
+const porPagina = 10;
+const filtrosIniciales = (solapa = "Activos") => ({
+    busqueda: "",
+    estado: "Todos",
+    fecha: "Todos",
+    pago: "Todos",
+    prioridad: "Todos",
+    orden: solapa === "Antiguos" ? "Recientes" : "Atención",
+});
+
+export default function Orders({
     pedidos = [],
     onBack,
     onNewOrder,
     onRefresh,
+    onOrderChanged,
     filtroInicial = "Todos",
+    estadoInicial = "Todos",
+    prioridadInicial = "Todos",
 }) {
     const configuracion = useWorkshopSettings();
-    const [busqueda, setBusqueda] = useState("");
-    const [filtroEstado, setFiltroEstado] =
-        useState("Todos");
-    const [filtroFecha, setFiltroFecha] =
-    useState(filtroInicial);
+    const [solapa, setSolapa] = useState("Activos");
+    const [filtros, setFiltros] = useState(() => ({
+        ...filtrosIniciales(),
+        fecha: filtroInicial === "Vencidos" ? "Atrasados" : filtroInicial,
+        estado: estadoInicial,
+        prioridad: prioridadInicial,
+    }));
+    const [pagina, setPagina] = useState(1);
+    const [mostrarFiltros, setMostrarFiltros] = useState(
+        estadoInicial !== "Todos" || prioridadInicial !== "Todos",
+    );
+    const [editando, setEditando] = useState(null);
+    const [detalle, setDetalle] = useState(null);
+    const [aviso, setAviso] = useState(null);
+    const [confirmacion, setConfirmacion] = useState(null);
+    const [ocupado, setOcupado] = useState(false);
+    const [errorAccion, setErrorAccion] = useState("");
+    const [resultado, setResultado] = useState(null);
+    const enviando = useRef(false);
+    const pestanas = useRef(null);
+    const resumen = resumenOrganizacion(pedidos);
+    const actuales = solapa === "Antiguos" ? resumen.antiguos : resumen.activos;
+    const encontrados = organizarPedidos(pedidos, { ...filtros, solapa });
+    const paginas = Math.max(1, Math.ceil(encontrados.length / porPagina));
+    const paginaVisible = Math.min(pagina, paginas);
+    const visibles = encontrados.slice(
+        (paginaVisible - 1) * porPagina,
+        paginaVisible * porPagina,
+    );
+    const hayFiltros =
+        filtros.busqueda.trim() ||
+        filtros.estado !== "Todos" ||
+        filtros.fecha !== "Todos" ||
+        filtros.pago !== "Todos" ||
+        filtros.prioridad !== "Todos";
 
-    const [pedidoSeleccionado, setPedidoSeleccionado] =
-        useState(null);
-
-    const [pedidoDetalle, setPedidoDetalle] =
-        useState(null);
-
-    const [pedidoListo, setPedidoListo] =
-        useState(null);
-
-    const [pedidoAEliminar, setPedidoAEliminar] =
-        useState(null);
-
-    const [eliminandoPedidoId, setEliminandoPedidoId] =
-        useState(null);
-
-    const [actualizandoPedidoId, setActualizandoPedidoId] =
-        useState(null);
-
-    // =====================================================
-    // REFRESCAR APP
-    // =====================================================
-
-    const refrescarApp = async () => {
-        if (onRefresh) {
-            await onRefresh();
-        }
-    };
-
-    // =====================================================
-    // ICONOS
-    // =====================================================
-
-    const obtenerIcono = (tipo) => <GarmentIcon tipo={tipo} />;
-
-    // =====================================================
-    // FECHA
-    // =====================================================
-
-    const formatearFecha = (fecha) => {
-        if (!fecha) {
-            return "Sin fecha";
-        }
-
-        const partes = fecha.split("-");
-
-        if (partes.length !== 3) {
-            return fecha;
-        }
-
-        return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    };
-
-    // =====================================================
-    // DINERO
-    // =====================================================
-
-    const formatearDinero = (valor) => {
-        return `$${Number(
-            valor || 0
-        ).toLocaleString("es-AR")}`;
-    };
-
-    // =====================================================
-    // ESTADO
-    // =====================================================
-
-    const obtenerClaseEstado = (estado) => {
-        if (estado === "Listo") {
-            return "status-ready";
-        }
-
-        if (estado === "Entregado") {
-            return "status-delivered";
-        }
-
-        return "status-process";
-    };
-
-    const obtenerTextoEstado = (estado) => {
-        if (estado === "Listo") {
-            return "Listo";
-        }
-
-        if (estado === "Entregado") {
-            return "Entregado";
-        }
-
-        if (estado === "Pendiente") {
-            return "Pendiente";
-        }
-
-        return "En proceso";
-    };
-
-    // =====================================================
-    // MARCAR COMO LISTO
-    // =====================================================
-
-    const marcarComoListo = async (pedido) => {
-        if (actualizandoPedidoId !== null) {
-            return;
-        }
-
-        setActualizandoPedidoId(pedido.id);
-
-        const { error } = await supabase
-            .from("pedidos")
-            .update({
-                estado: "Listo",
-            })
-            .eq("id", pedido.id);
-
-        if (error) {
-            console.error(
-                "Error marcando pedido como listo:",
-                error
+    function filtrar(campo, valor) {
+        setFiltros((actual) => ({ ...actual, [campo]: valor }));
+        setPagina(1);
+    }
+    function cambiarSolapa(siguiente) {
+        setSolapa(siguiente);
+        setFiltros((actual) => ({
+            ...filtrosIniciales(siguiente),
+            busqueda: actual.busqueda,
+        }));
+        setPagina(1);
+        setResultado(null);
+        setErrorAccion("");
+    }
+    function limpiar() {
+        setFiltros(filtrosIniciales(solapa));
+        setPagina(1);
+    }
+    function abrirConfirmacion(tipo, pedido) {
+        setErrorAccion("");
+        setConfirmacion({ tipo, pedido });
+    }
+    async function refrescar() {
+        try {
+            await onRefresh?.();
+        } catch {
+            setErrorAccion(
+                "El cambio se guardó, pero no pudimos actualizar la lista. Reintentá la carga.",
             );
-
-            alert(
-                "No se pudo marcar el pedido como listo.\n\n" +
-                    error.message
+        }
+    }
+    async function actualizarEstado(pedido, estado) {
+        if (enviando.current) return;
+        enviando.current = true;
+        setOcupado(true);
+        setErrorAccion("");
+        try {
+            // Solo cambia el trabajo: entregar no cobra ni modifica la seña.
+            const { data, error } = await supabase
+                .from("pedidos")
+                .update({ estado })
+                .eq("id", pedido.id)
+                .select(seleccionPedido)
+                .single();
+            if (error) throw error;
+            onOrderChanged?.(data);
+            setConfirmacion(null);
+            setResultado({
+                texto:
+                    estado === "Entregado"
+                        ? `El pedido de ${data.clientes?.nombre || "tu cliente"} pasó a Antiguos.`
+                        : estado === "En proceso"
+                          ? "El pedido volvió a Activos."
+                          : "Pedido listo para retirar.",
+                solapa:
+                    estado === "Entregado"
+                        ? "Antiguos"
+                        : estado === "En proceso"
+                          ? "Activos"
+                          : null,
+            });
+            if (estado === "Listo") setAviso(data);
+            await refrescar();
+        } catch (error) {
+            console.error("Error cambiando estado:", error);
+            setErrorAccion(
+                "No pudimos confirmar el cambio de estado. Revisá el pedido y reintentá la carga antes de volver a intentar.",
             );
-
-            setActualizandoPedidoId(null);
-            return;
+        } finally {
+            enviando.current = false;
+            setOcupado(false);
         }
-
-        const pedidoActualizado = {
-            ...pedido,
-            estado: "Listo",
-        };
-
-        setActualizandoPedidoId(null);
-
-        setPedidoListo(pedidoActualizado);
-
-        await refrescarApp();
-    };
-
-    // =====================================================
-    // WHATSAPP
-    // =====================================================
-
-    // =====================================================
-    // ELIMINAR
-    // =====================================================
-
-    const abrirModalEliminar = (pedido) => {
-        setPedidoAEliminar(pedido);
-    };
-
-    const cerrarEliminar = () => {
-        if (eliminandoPedidoId !== null) {
-            return;
+    }
+    async function eliminar() {
+        if (enviando.current || !confirmacion) return;
+        enviando.current = true;
+        setOcupado(true);
+        setErrorAccion("");
+        try {
+            const { error } = await supabase
+                .from("pedidos")
+                .delete()
+                .eq("id", confirmacion.pedido.id)
+                .select("id")
+                .single();
+            if (error) throw error;
+            onOrderChanged?.({ id: confirmacion.pedido.id, eliminado: true });
+            setConfirmacion(null);
+            setResultado({ texto: "Pedido eliminado." });
+            await refrescar();
+        } catch (error) {
+            console.error("Error eliminando pedido:", error);
+            setErrorAccion("No se pudo eliminar el pedido. Intentá de nuevo.");
+        } finally {
+            enviando.current = false;
+            setOcupado(false);
         }
-
-        setPedidoAEliminar(null);
-    };
-
-    const eliminarPedido = async () => {
-        if (!pedidoAEliminar) {
-            return;
+    }
+    async function guardarEdicion(pedido, mantenerDetalle = false) {
+        onOrderChanged?.(pedido);
+        setEditando(null);
+        const destino = esAntiguo(pedido) ? "Antiguos" : "Activos";
+        if (destino !== solapa) {
+            setSolapa(destino);
+            setFiltros(filtrosIniciales(destino));
+            setPagina(1);
         }
+        if (mantenerDetalle) setDetalle(pedido);
+        setResultado({ texto: "Pedido actualizado." });
+        await refrescar();
+    }
 
-        const id = pedidoAEliminar.id;
-
-        setEliminandoPedidoId(id);
-
-        const { error } = await supabase
-            .from("pedidos")
-            .delete()
-            .eq("id", id);
-
-        if (error) {
-            console.error(
-                "Error eliminando pedido:",
-                error
-            );
-
-            alert(
-                "No se pudo eliminar el pedido.\n\n" +
-                    error.message
-            );
-
-            setEliminandoPedidoId(null);
-            return;
-        }
-
-        setPedidoAEliminar(null);
-        setEliminandoPedidoId(null);
-
-        if (
-            pedidoDetalle?.id === id
-        ) {
-            setPedidoDetalle(null);
-        }
-
-        if (
-            pedidoSeleccionado?.id === id
-        ) {
-            setPedidoSeleccionado(null);
-        }
-
-        await refrescarApp();
-    };
-
-    // =====================================================
-    // FILTROS
-    // =====================================================
-
-    const pedidosFiltrados =
-    pedidos.filter((pedido) => {
-
-        const coincideTexto = coincideBusqueda(pedido, busqueda);
-
-        const coincideEstado =
-            filtroEstado === "Todos" ||
-            pedido.estado === filtroEstado;
-
-        // =============================
-        // FILTRO POR FECHA
-        // =============================
-
-        const hoy = new Date();
-
-        hoy.setHours(0, 0, 0, 0);
-
-        const fechaPedido =
-            pedido.fecha_entrega
-                ? new Date(
-                    `${pedido.fecha_entrega}T00:00:00`
-                )
-                : null;
-
-        let coincideFecha = true;
-
-        if (filtroFecha === "Hoy") {
-
-            coincideFecha =
-                fechaPedido !== null &&
-                fechaPedido.getTime() ===
-                    hoy.getTime();
-
-        }
-
-        if (filtroFecha === "Mañana") {
-
-            const manana =
-                new Date(hoy);
-
-            manana.setDate(
-                manana.getDate() + 1
-            );
-
-            coincideFecha =
-                fechaPedido !== null &&
-                fechaPedido.getTime() ===
-                    manana.getTime();
-
-        }
-
-        if (filtroFecha === "Esta semana") {
-
-            const inicioSemana =
-                new Date(hoy);
-
-            const diaSemana =
-                inicioSemana.getDay();
-
-            const diferencia =
-                diaSemana === 0
-                    ? 6
-                    : diaSemana - 1;
-
-            inicioSemana.setDate(
-                inicioSemana.getDate() -
-                    diferencia
-            );
-
-            inicioSemana.setHours(
-                0,
-                0,
-                0,
-                0
-            );
-
-            const finSemana =
-                new Date(
-                    inicioSemana
-                );
-
-            finSemana.setDate(
-                finSemana.getDate() + 6
-            );
-
-            finSemana.setHours(
-                23,
-                59,
-                59,
-                999
-            );
-
-            coincideFecha =
-                fechaPedido !== null &&
-                fechaPedido >= inicioSemana &&
-                fechaPedido <= finSemana;
-
-        }
-
-       if (
-    filtroFecha === "Atrasados" ||
-    filtroFecha === "Vencidos"
-) {
-    coincideFecha =
-        fechaPedido !== null &&
-        fechaPedido < hoy &&
-        pedido.estado !== "Entregado";
-}
-
-        return (
-            coincideTexto &&
-            coincideEstado &&
-            coincideFecha
-        );
-    });
-        
-
-    // =====================================================
-    // EDICIÓN
-    // =====================================================
-
-    if (pedidoSeleccionado) {
+    if (editando)
         return (
             <EditOrder
-                pedido={
-                    pedidoSeleccionado
-                }
-
-                onBack={async () => {
-                    setPedidoSeleccionado(
-                        null
-                    );
-
-                    await refrescarApp();
-                }}
-
-                onSaved={async () => {
-                    setPedidoSeleccionado(
-                        null
-                    );
-
-                    await refrescarApp();
-                }}
+                pedido={editando}
+                onBack={() => setEditando(null)}
+                onSaved={(pedido) => guardarEdicion(pedido)}
             />
         );
-    }
-
-    // =====================================================
-    // DETALLE
-    // =====================================================
-
-    if (pedidoDetalle) {
+    if (detalle)
         return (
             <OrderDetail
-                pedido={pedidoDetalle}
-
-                onBack={() => {
-                    setPedidoDetalle(null);
-                }}
-
-                onSaved={async (pedidoActualizado) => {
-                    setPedidoDetalle(
-                        pedidoActualizado
-                    );
-
-                    await refrescarApp();
-                }}
+                pedido={detalle}
+                onBack={() => setDetalle(null)}
+                onSaved={(pedido) => guardarEdicion(pedido, true)}
             />
         );
-    }
-
-    // =====================================================
-    // PANTALLA
-    // =====================================================
 
     return (
-        <div className="orders-page">
-
-            {/* HEADER */}
-
-            <div className="orders-header">
-
+        <div className="orders-page organized-orders">
+            <header className="orders-header">
                 <div>
-                    <h1>
-                        Pedidos
-                    </h1>
-
+                    <h1>Pedidos</h1>
                     <p>
-                        Acá podés ver y administrar todos
-                        los pedidos.
+                        El trabajo de cada día y el historial de tu taller, en
+                        su lugar.
                     </p>
                 </div>
-
                 <div className="orders-header-actions">
-
                     <button
+                        type="button"
                         className="back-button"
                         onClick={onBack}
                     >
                         ← Inicio
                     </button>
-
                     <button
+                        type="button"
                         className="new-order-button"
                         onClick={onNewOrder}
                     >
-                        <Icon name="plus" /> Nuevo pedido
+                        <Icon name="plus" />
+                        Nuevo pedido
                     </button>
-
                 </div>
-
-            </div>
-
-            {/* FILTROS */}
-
-            <div className="orders-toolbar">
-                <div className="date-filters">
-
-    <button
-        type="button"
-        className={
-            filtroFecha === "Todos"
-                ? "date-filter-button active"
-                : "date-filter-button"
-        }
-        onClick={() =>
-            setFiltroFecha("Todos")
-        }
-    >
-        <Icon name="orders" /> Todos
-    </button>
-
-    <button
-        type="button"
-        className={
-            filtroFecha === "Hoy"
-                ? "date-filter-button active"
-                : "date-filter-button"
-        }
-        onClick={() =>
-            setFiltroFecha("Hoy")
-        }
-    >
-        <Icon name="calendar" /> Hoy
-    </button>
-
-    <button
-        type="button"
-        className={
-            filtroFecha === "Mañana"
-                ? "date-filter-button active"
-                : "date-filter-button"
-        }
-        onClick={() =>
-            setFiltroFecha("Mañana")
-        }
-    >
-        Mañana
-    </button>
-
-    <button
-        type="button"
-        className={
-            filtroFecha === "Esta semana"
-                ? "date-filter-button active"
-                : "date-filter-button"
-        }
-        onClick={() =>
-            setFiltroFecha("Esta semana")
-        }
-    >
-        Esta semana
-    </button>
-
-    <button
-        type="button"
-        className={
-            filtroFecha === "Vencidos"
-                ? "date-filter-button overdue"
-                : "date-filter-button"
-        }
-        onClick={() =>
-            setFiltroFecha("Vencidos")
-        }
-    >
-        <Icon name="alert" /> Atrasados
-    </button>
-
-</div>
-
-                <div className="search-box">
-
-                    <span>
-                        <Icon name="search" />
-                    </span>
-
-                    <input
-                        type="text"
-                        placeholder="Buscar por cliente, teléfono, prenda o descripción..."
-                        value={busqueda}
-                        onChange={(e) =>
-                            setBusqueda(
-                                e.target.value
-                            )
-                        }
-                    />
-
-                </div>
-
-                <div className="status-filter">
-
-                    <label>
-                        Estado
-                    </label>
-
-                    <select
-                        value={filtroEstado}
-                        onChange={(e) =>
-                            setFiltroEstado(
-                                e.target.value
-                            )
-                        }
-                    >
-                        <option value="Todos">
-                            Todos
-                        </option>
-
-                        <option value="En proceso">
-                            En proceso
-                        </option>
-
-                        <option value="Pendiente">
-                            Pendiente
-                        </option>
-
-                        <option value="Listo">
-                            Listo
-                        </option>
-
-                        <option value="Entregado">
-                            Entregado
-                        </option>
-                    </select>
-
-                </div>
-
-            </div>
-
-            {/* CONTADOR */}
-
-            <div className="orders-count">
-
-                <strong>
-                    {pedidosFiltrados.length}
-                </strong>
-
-                <span>
-                    {pedidosFiltrados.length === 1
-                        ? " pedido encontrado"
-                        : " pedidos encontrados"}
-                </span>
-
-            </div>
-
-            {/* LISTA */}
-
-            {pedidosFiltrados.length === 0 ? (
-
-                <div className="orders-empty">
-
-                    <div className="empty-icon">
-                        <Icon name="orders" />
-                    </div>
-
-                    <h2>
-                        No encontramos pedidos
-                    </h2>
-
-                    <p>
-                        Probá cambiando el filtro
-                        o creando un nuevo pedido.
-                    </p>
-
+            </header>
+            <div
+                className="orders-scope-tabs"
+                role="tablist"
+                aria-label="Organización de pedidos"
+                ref={pestanas}
+                onKeyDown={(event) => {
+                    if (
+                        !["ArrowLeft", "ArrowRight", "Home", "End"].includes(
+                            event.key,
+                        )
+                    )
+                        return;
+                    event.preventDefault();
+                    const siguiente =
+                        event.key === "Home"
+                            ? "Activos"
+                            : event.key === "End"
+                              ? "Antiguos"
+                              : solapa === "Activos"
+                                ? "Antiguos"
+                                : "Activos";
+                    cambiarSolapa(siguiente);
+                    pestanas.current
+                        .querySelector(`#solapa-${siguiente}`)
+                        ?.focus();
+                }}
+            >
+                {["Activos", "Antiguos"].map((nombre) => (
                     <button
-                        className="new-order-button"
-                        onClick={onNewOrder}
+                        key={nombre}
+                        id={`solapa-${nombre}`}
+                        type="button"
+                        role="tab"
+                        aria-selected={solapa === nombre}
+                        aria-controls="panel-pedidos"
+                        tabIndex={solapa === nombre ? 0 : -1}
+                        onClick={() => cambiarSolapa(nombre)}
                     >
-                        <Icon name="plus" /> Crear pedido
+                        <Icon
+                            name={nombre === "Activos" ? "thread" : "orders"}
+                        />
+                        {nombre}
+                        <span>
+                            {nombre === "Activos"
+                                ? resumen.activos.length
+                                : resumen.antiguos.length}
+                        </span>
                     </button>
-
-                </div>
-
-            ) : (
-
-                <div className="orders-list">
-
-                    {pedidosFiltrados.map(
-                        (pedido) => {
-
-                            const { total: precio, saldo } = resumenPago(pedido);
-
-                            const actualizando =
-                                actualizandoPedidoId ===
-                                pedido.id;
-
-                            const cantidadTrabajos =
-                                pedido.pedido_prendas
-                                    ?.length || 0;
-
-                            return (
-
-                                <div
-                                    className="order-card-new"
-                                    key={pedido.id}
-                                >
-
-                                    {/* ICONO */}
-
-                                    <div className="order-card-icon">
-
-                                        {obtenerIcono(
-                                            pedido.pedido_prendas?.[0]
-                                                ?.tipo_prenda ||
-                                                pedido.tipo_prenda
-                                        )}
-
-                                    </div>
-
-                                    {/* INFORMACIÓN */}
-
-                                    <div className="order-main-info">
-
-                                        <div className="order-title-row">
-
-                                            <h2>
-                                                {pedido.clientes?.nombre ||
-                                                    "Sin cliente"}
-                                            </h2>
-
-                                            {pedido.prioridad ===
-                                                "Urgente" && (
-
-                                                <span className="priority-badge">
-                                                    <Icon name="alert" /> Urgente
-                                                </span>
-
-                                            )}
-
-                                        </div>
-
-                                        <p className="order-client">
-
-                                            {cantidadTrabajos > 1
-                                                ? `${cantidadTrabajos} tipos de trabajo`
-                                                : "1 trabajo"}
-
-                                        </p>
-
-                                        <div className="order-garments-preview">
-
-                                            {cantidadTrabajos >
-                                            0 ? (
-
-                                                pedido.pedido_prendas
-                                                    .map(
-                                                        (
-                                                            prenda
-                                                        ) => (
-
-                                                            <div
-                                                                key={
-                                                                    prenda.id
-                                                                }
-                                                                className="order-garment-row"
-                                                            >
-
-                                                                <span className="order-garment-icon">
-
-                                                                    {obtenerIcono(
-                                                                        prenda.tipo_prenda
-                                                                    )}
-
-                                                                </span>
-
-                                                                <div>
-
-                                                                    <strong>
-
-                                                                        {
-                                                                            prenda.tipo_prenda
-                                                                        }
-
-                                                                        {" × "}
-
-                                                                        {
-                                                                            prenda.cantidad
-                                                                        }
-                                                                        <small className="order-line-subtotal"> · {formatearDinero(subtotalPrenda(prenda))}</small>
-                                                                    </strong>
-
-                                                                    <span>
-
-                                                                        {prenda.descripcion ||
-                                                                            "Sin descripción"}
-
-                                                                    </span>
-
-                                                                </div>
-
-                                                            </div>
-
-                                                        )
-                                                    )
-
-                                            ) : (
-
-                                                <div className="order-garment-row">
-
-                                                    <span className="order-garment-icon">
-
-                                                        {obtenerIcono(
-                                                            pedido.tipo_prenda
-                                                        )}
-
-                                                    </span>
-
-                                                    <div>
-
-                                                        <strong>
-                                                            {pedido.tipo_prenda ||
-                                                                "Pedido"}
-                                                        </strong>
-
-                                                        <span>
-                                                            {pedido.descripcion ||
-                                                                "Sin descripción"}
-                                                        </span>
-
-                                                    </div>
-
-                                                </div>
-
-                                            )}
-
-                                        </div>
-
-                                    </div>
-
-                                    {/* FECHA */}
-
-                                    <div className="order-info-block">
-
-                                        <span>
-                                            <Icon name="calendar" /> Entrega
-                                        </span>
-
-                                        <strong>
-                                            {formatearFecha(
-                                                pedido.fecha_entrega
-                                            )}
-                                        </strong>
-
-                                    </div>
-
-                                    {/* PAGO */}
-
-                                    <div className="order-payment">
-
-                                        <div>
-
-                                            <span>
-                                                <Icon name="wallet" /> Total
-                                            </span>
-
-                                            <strong>
-                                                {formatearDinero(
-                                                    precio
-                                                )}
-                                            </strong>
-
-                                        </div>
-
-                                        <div>
-
-                                            <span>
-                                                <Icon name="wallet" /> Saldo
-                                            </span>
-
-                                            <strong
-                                                className={
-                                                    saldo > 0
-                                                        ? "saldo-pendiente"
-                                                        : "saldo-pagado"
-                                                }
-                                            >
-                                                {formatearDinero(
-                                                    saldo
-                                                )}
-                                            </strong>
-
-                                        </div>
-
-                                    </div>
-
-                                    {/* ESTADO */}
-
-                                    <div
-                                        className={`order-status-badge ${obtenerClaseEstado(
-                                            pedido.estado
-                                        )}`}
-                                    >
-                                        {obtenerTextoEstado(
-                                            pedido.estado
-                                        )}
-                                    </div>
-
-                                    {/* ACCIONES */}
-
-                                    <div className="order-actions">
-
-                                        {pedido.estado !==
-                                            "Listo" &&
-                                            pedido.estado !==
-                                                "Entregado" && (
-
-                                                <button
-                                                    type="button"
-                                                    className="ready-order-button"
-                                                    onClick={() =>
-                                                        marcarComoListo(
-                                                            pedido
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        actualizando
-                                                    }
-                                                >
-                                                    {actualizando
-                                                        ? "Guardando..."
-                                                        : "✓ Marcar como listo"}
-                                                </button>
-
-                                            )}
-
-                                        {pedido.estado === "Listo" && <button type="button" className="whatsapp-order-button" aria-label="Avisar por WhatsApp" onClick={() => setPedidoListo(pedido)}><Icon name="message" /> Avisar</button>}
-
-                                        <button
-                                            type="button"
-                                            className="view-order-button"
-                                            onClick={() =>
-                                                setPedidoDetalle(
-                                                    pedido
-                                                )
-                                            }
-                                        >
-                                            <Icon name="eye" /> Ver pedido
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="edit-order-button"
-                                            onClick={() =>
-                                                setPedidoSeleccionado(
-                                                    pedido
-                                                )
-                                            }
-                                            disabled={
-                                                actualizando
-                                            }
-                                        >
-                                            <Icon name="edit" /> Editar
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="delete-order-button"
-                                            onClick={() =>
-                                                abrirModalEliminar(
-                                                    pedido
-                                                )
-                                            }
-                                            disabled={
-                                                actualizando
-                                            }
-                                        >
-                                            <Icon name="trash" /> Eliminar
-                                        </button>
-
-                                    </div>
-
-                                </div>
-                            );
-                        }
+                ))}
+            </div>
+            <section
+                id="panel-pedidos"
+                role="tabpanel"
+                aria-labelledby={`solapa-${solapa}`}
+            >
+                <p className="orders-scope-description">
+                    {solapa === "Activos"
+                        ? "Pendientes, en proceso y listos para retirar. Al entregar una prenda, el pedido pasa a Antiguos."
+                        : "Pedidos ya entregados. Podés consultarlos, corregirlos o reactivarlos sin perder su información."}
+                </p>
+                <div className="orders-overview">
+                    {solapa === "Activos" ? (
+                        <>
+                            <div>
+                                <Icon name="thread" />
+                                <span>
+                                    En trabajo
+                                    <strong>{resumen.enTrabajo}</strong>
+                                </span>
+                            </div>
+                            <div>
+                                <Icon name="checkCircle" />
+                                <span>
+                                    Listos para retirar
+                                    <strong>{resumen.listos}</strong>
+                                </span>
+                            </div>
+                            <div>
+                                <Icon name="wallet" />
+                                <span>
+                                    Por cobrar
+                                    <strong>
+                                        {formatearDinero(resumen.saldoActivos)}
+                                    </strong>
+                                </span>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div>
+                                <Icon name="orders" />
+                                <span>
+                                    Pedidos entregados
+                                    <strong>{resumen.antiguos.length}</strong>
+                                </span>
+                            </div>
+                            <div>
+                                <Icon name="wallet" />
+                                <span>
+                                    Saldo de los antiguos
+                                    <strong>
+                                        {formatearDinero(resumen.saldoAntiguos)}
+                                    </strong>
+                                </span>
+                            </div>
+                        </>
                     )}
-
                 </div>
-
-            )}
-
-            {/* =================================================
-                MODAL PEDIDO LISTO
-            ================================================= */}
-
-            {pedidoListo && (
-
-                <div
-                    className="status-modal-backdrop"
-                    onClick={() =>
-                        setPedidoListo(null)
-                    }
-                >
-
-                    <section
-                        className="status-modal ready-modal"
-                        aria-label="Aviso de retiro"
-                        role="dialog"
-                        aria-modal="true"
-                        onClick={(event) =>
-                            event.stopPropagation()
-                        }
+                {resultado && (
+                    <div className="orders-result" role="status">
+                        <span>{resultado.texto}</span>
+                        {resultado.solapa && resultado.solapa !== solapa && (
+                            <button
+                                type="button"
+                                onClick={() => cambiarSolapa(resultado.solapa)}
+                            >
+                                Ver en {resultado.solapa} →
+                            </button>
+                        )}
+                    </div>
+                )}
+                {errorAccion && !confirmacion && (
+                    <p className="form-error-banner" role="alert">
+                        {errorAccion}
+                    </p>
+                )}
+                <div className="organized-filters">
+                    <div className="organized-search">
+                        <Icon name="search" />
+                        <label
+                            className="visually-hidden"
+                            htmlFor="buscar-pedidos"
+                        >
+                            Buscar pedidos
+                        </label>
+                        <input
+                            id="buscar-pedidos"
+                            type="search"
+                            placeholder="Cliente, teléfono, prenda o descripción"
+                            value={filtros.busqueda}
+                            onChange={(event) =>
+                                filtrar("busqueda", event.target.value)
+                            }
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        className="toggle-organized-filters"
+                        aria-controls="filtros-pedidos"
+                        aria-expanded={mostrarFiltros}
+                        onClick={() => setMostrarFiltros((actual) => !actual)}
                     >
-
-                        <div className="status-modal-icon">
-                            <Icon name="checkCircle" />
+                        <Icon name="settings" />
+                        Filtros y orden
+                        {[
+                            filtros.estado,
+                            filtros.prioridad,
+                            filtros.pago,
+                        ].filter((valor) => valor !== "Todos").length > 0 && (
+                            <span>
+                                {
+                                    [
+                                        filtros.estado,
+                                        filtros.prioridad,
+                                        filtros.pago,
+                                    ].filter((valor) => valor !== "Todos")
+                                        .length
+                                }
+                            </span>
+                        )}
+                    </button>
+                    <div
+                        id="filtros-pedidos"
+                        className={`organized-selects ${mostrarFiltros ? "is-expanded" : "is-collapsed"} ${solapa === "Antiguos" ? "archive-filters" : ""}`}
+                    >
+                        {solapa === "Activos" && (
+                            <>
+                                <div className="organized-filter-field">
+                                    <label htmlFor="ordenes-estado">
+                                        Estado
+                                    </label>
+                                    <select
+                                        id="ordenes-estado"
+                                        value={filtros.estado}
+                                        onChange={(event) =>
+                                            filtrar(
+                                                "estado",
+                                                event.target.value,
+                                            )
+                                        }
+                                    >
+                                        <option value="Todos">
+                                            Todos los estados
+                                        </option>
+                                        <option>En trabajo</option>
+                                        <option>Pendiente</option>
+                                        <option>En proceso</option>
+                                        <option value="Listo">
+                                            Listos para retirar
+                                        </option>
+                                    </select>
+                                </div>
+                                <div className="organized-filter-field">
+                                    <label htmlFor="ordenes-prioridad">
+                                        Prioridad
+                                    </label>
+                                    <select
+                                        id="ordenes-prioridad"
+                                        value={filtros.prioridad}
+                                        onChange={(event) =>
+                                            filtrar(
+                                                "prioridad",
+                                                event.target.value,
+                                            )
+                                        }
+                                    >
+                                        <option value="Todos">Todas</option>
+                                        <option>Urgente</option>
+                                    </select>
+                                </div>
+                            </>
+                        )}
+                        <div className="organized-filter-field">
+                            <label htmlFor="ordenes-pago">Pago</label>
+                            <select
+                                id="ordenes-pago"
+                                value={filtros.pago}
+                                onChange={(event) =>
+                                    filtrar("pago", event.target.value)
+                                }
+                            >
+                                <option value="Todos">Todos</option>
+                                <option value="Con saldo">
+                                    Con saldo pendiente
+                                </option>
+                                <option value="Sin saldo">
+                                    Sin saldo pendiente
+                                </option>
+                            </select>
                         </div>
-
+                        <div className="organized-filter-field">
+                            <label htmlFor="ordenes-orden">Ordenar por</label>
+                            <select
+                                id="ordenes-orden"
+                                value={filtros.orden}
+                                onChange={(event) =>
+                                    filtrar("orden", event.target.value)
+                                }
+                            >
+                                {solapa === "Activos" ? (
+                                    <>
+                                        <option value="Atención">
+                                            Prioridad de atención
+                                        </option>
+                                        <option value="Fecha">
+                                            Fecha prevista: próxima
+                                        </option>
+                                    </>
+                                ) : (
+                                    <option value="Recientes">
+                                        Fecha prevista: reciente
+                                    </option>
+                                )}
+                                <option value="Cliente">Cliente: A–Z</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div
+                        className="organized-date-filters"
+                        role="group"
+                        aria-label="Fecha de entrega prevista"
+                    >
+                        {[
+                            "Todos",
+                            "Hoy",
+                            "Mañana",
+                            "Esta semana",
+                            ...(solapa === "Activos" ? ["Atrasados"] : []),
+                        ].map((fecha) => (
+                            <button
+                                key={fecha}
+                                type="button"
+                                aria-pressed={filtros.fecha === fecha}
+                                onClick={() => filtrar("fecha", fecha)}
+                            >
+                                {fecha === "Todos" ? "Cualquier fecha" : fecha}
+                            </button>
+                        ))}
+                        {hayFiltros && (
+                            <button
+                                type="button"
+                                className="clear-order-filters"
+                                onClick={limpiar}
+                            >
+                                Limpiar filtros
+                            </button>
+                        )}
+                    </div>
+                </div>
+                <div className="organized-results-heading">
+                    <p role="status">
+                        {encontrados.length} de {actuales.length}{" "}
+                        {solapa.toLowerCase()}
+                        {hayFiltros ? " coinciden con la búsqueda" : ""}
+                    </p>
+                    <span>
+                        {filtros.orden === "Cliente"
+                            ? "Por nombre del cliente, de A a Z."
+                            : filtros.orden === "Fecha"
+                              ? "Por fecha de entrega prevista: próximas primero."
+                              : solapa === "Activos"
+                                ? "Primero, lo que necesita tu atención."
+                                : "Por fecha de entrega prevista: recientes primero."}
+                    </span>
+                </div>
+                {encontrados.length ? (
+                    <>
+                        <div className="orders-list organized-orders-list">
+                            {visibles.map((pedido) => (
+                                <OrganizedOrderCard
+                                    key={pedido.id}
+                                    pedido={pedido}
+                                    ocupado={ocupado}
+                                    onView={setDetalle}
+                                    onEdit={setEditando}
+                                    onReady={(pedido) =>
+                                        actualizarEstado(pedido, "Listo")
+                                    }
+                                    onDeliver={(pedido) =>
+                                        abrirConfirmacion("entregar", pedido)
+                                    }
+                                    onReactivate={(pedido) =>
+                                        abrirConfirmacion("reactivar", pedido)
+                                    }
+                                    onWhatsapp={setAviso}
+                                    onDelete={(pedido) =>
+                                        abrirConfirmacion("eliminar", pedido)
+                                    }
+                                />
+                            ))}
+                        </div>
+                        {paginas > 1 && (
+                            <nav
+                                className="orders-pagination"
+                                aria-label="Páginas de pedidos"
+                            >
+                                <button
+                                    type="button"
+                                    disabled={paginaVisible === 1}
+                                    onClick={() => setPagina(paginaVisible - 1)}
+                                >
+                                    ← Anterior
+                                </button>
+                                <span>
+                                    Página {paginaVisible} de {paginas}
+                                </span>
+                                <button
+                                    type="button"
+                                    disabled={paginaVisible === paginas}
+                                    onClick={() => setPagina(paginaVisible + 1)}
+                                >
+                                    Siguiente →
+                                </button>
+                            </nav>
+                        )}
+                    </>
+                ) : (
+                    <div className="organized-empty">
+                        <Icon
+                            name={
+                                solapa === "Antiguos" ? "orders" : "checkCircle"
+                            }
+                        />
                         <h2>
-                            ¡Pedido listo!
+                            {hayFiltros
+                                ? "No hay coincidencias"
+                                : solapa === "Antiguos"
+                                  ? "Todavía no hay pedidos antiguos"
+                                  : "No hay pedidos activos"}
                         </h2>
-
                         <p>
-                            El pedido de{" "}
-                            <strong>
-                                {pedidoListo.clientes?.nombre ||
-                                    "tu cliente"}
-                            </strong>{" "}
-                            ya está listo para retirar.
+                            {hayFiltros
+                                ? "Probá otra búsqueda o limpiá los filtros."
+                                : solapa === "Antiguos"
+                                  ? "Los pedidos aparecerán acá cuando los marques como entregados."
+                                  : "Los pedidos nuevos aparecerán acá para que puedas seguirlos hasta la entrega."}
                         </p>
-
-                        <WhatsAppMessage pedido={pedidoListo} configuracion={configuracion} />
-
+                        {hayFiltros ? (
+                            <button
+                                type="button"
+                                className="organized-secondary"
+                                onClick={limpiar}
+                            >
+                                Limpiar filtros
+                            </button>
+                        ) : (
+                            solapa === "Activos" && (
+                                <button
+                                    type="button"
+                                    className="new-order-button"
+                                    onClick={onNewOrder}
+                                >
+                                    <Icon name="plus" />
+                                    Crear pedido
+                                </button>
+                            )
+                        )}
+                    </div>
+                )}
+            </section>
+            {aviso && (
+                <OrderDialog
+                    titulo="Aviso de retiro"
+                    onClose={() => setAviso(null)}
+                >
+                    <p>
+                        El pedido de{" "}
+                        <strong>
+                            {aviso.clientes?.nombre || "tu cliente"}
+                        </strong>{" "}
+                        está listo para retirar.
+                    </p>
+                    <WhatsAppMessage
+                        pedido={aviso}
+                        configuracion={configuracion}
+                    />
+                    <button
+                        type="button"
+                        className="modal-close-button"
+                        onClick={() => setAviso(null)}
+                    >
+                        Ahora no
+                    </button>
+                </OrderDialog>
+            )}
+            {confirmacion && (
+                <OrderDialog
+                    titulo={
+                        confirmacion.tipo === "eliminar"
+                            ? "¿Eliminar pedido?"
+                            : confirmacion.tipo === "entregar"
+                              ? "¿La prenda ya fue retirada?"
+                              : "¿Reactivar este pedido?"
+                    }
+                    ocupado={ocupado}
+                    onClose={() => {
+                        if (!ocupado) {
+                            setConfirmacion(null);
+                            setErrorAccion("");
+                        }
+                    }}
+                >
+                    <p>
+                        Pedido de{" "}
+                        <strong>
+                            {confirmacion.pedido.clientes?.nombre ||
+                                "tu cliente"}
+                        </strong>
+                        .
+                    </p>
+                    <p>
+                        {confirmacion.tipo === "eliminar"
+                            ? "Se eliminará definitivamente. Para conservar un trabajo resuelto, usá Marcar entregado."
+                            : confirmacion.tipo === "entregar"
+                              ? "Pasará a la solapa Antiguos para conservarlo en el historial."
+                              : "Volverá a Activos con estado En proceso."}
+                    </p>
+                    {confirmacion.tipo !== "eliminar" && (
+                        <p className="order-confirm-balance">
+                            Saldo pendiente:{" "}
+                            <strong>
+                                {formatearDinero(
+                                    resumenPago(confirmacion.pedido).saldo,
+                                )}
+                            </strong>
+                            . Esta acción no cambia los pagos.
+                        </p>
+                    )}
+                    {errorAccion && (
+                        <p className="field-error" role="alert">
+                            {errorAccion}
+                        </p>
+                    )}
+                    <div className="orders-dialog-actions">
                         <button
                             type="button"
-                            className="modal-close-button"
+                            className="organized-secondary"
+                            disabled={ocupado}
+                            onClick={() => {
+                                setConfirmacion(null);
+                                setErrorAccion("");
+                            }}
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="button"
+                            className={
+                                confirmacion.tipo === "eliminar"
+                                    ? "organized-danger"
+                                    : "organized-primary"
+                            }
+                            disabled={ocupado}
                             onClick={() =>
-                                setPedidoListo(null)
+                                confirmacion.tipo === "eliminar"
+                                    ? eliminar()
+                                    : actualizarEstado(
+                                          confirmacion.pedido,
+                                          confirmacion.tipo === "entregar"
+                                              ? "Entregado"
+                                              : "En proceso",
+                                      )
                             }
                         >
-                            Ahora no
+                            {ocupado
+                                ? "Guardando…"
+                                : confirmacion.tipo === "eliminar"
+                                  ? "Sí, eliminar"
+                                  : confirmacion.tipo === "entregar"
+                                    ? "Confirmar entrega"
+                                    : "Reactivar pedido"}
                         </button>
-
-                    </section>
-
-                </div>
+                    </div>
+                </OrderDialog>
             )}
-
-            {/* =================================================
-                MODAL ELIMINAR
-            ================================================= */}
-
-            {pedidoAEliminar && (
-
-                <div
-                    className="status-modal-backdrop"
-                    onClick={cerrarEliminar}
-                >
-
-                    <section
-                        className="status-modal delete-modal"
-                        role="dialog"
-                        aria-modal="true"
-                        onClick={(event) =>
-                            event.stopPropagation()
-                        }
-                    >
-
-                        <div className="delete-modal-icon">
-                            <Icon name="trash" />
-                        </div>
-
-                        <h2>
-                            ¿Eliminar pedido?
-                        </h2>
-
-                        <p>
-                            Vas a eliminar el pedido de{" "}
-                            <strong>
-                                {pedidoAEliminar.clientes?.nombre ||
-                                    "este cliente"}
-                            </strong>
-                            .
-                        </p>
-
-                        <span className="delete-warning">
-                            Esta acción no se puede deshacer.
-                        </span>
-
-                        <div className="delete-modal-actions">
-
-                            <button
-                                type="button"
-                                className="delete-cancel-button"
-                                onClick={
-                                    cerrarEliminar
-                                }
-                                disabled={
-                                    eliminandoPedidoId !==
-                                    null
-                                }
-                            >
-                                Cancelar
-                            </button>
-
-                            <button
-                                type="button"
-                                className="delete-confirm-button"
-                                onClick={
-                                    eliminarPedido
-                                }
-                                disabled={
-                                    eliminandoPedidoId ===
-                                    pedidoAEliminar.id
-                                }
-                            >
-                                {eliminandoPedidoId ===
-                                pedidoAEliminar.id
-                                    ? "Eliminando..."
-                                    : "Sí, eliminar"}
-                            </button>
-
-                        </div>
-
-                    </section>
-
-                </div>
-
-            )}
-
         </div>
     );
 }
-
-export default Orders;
