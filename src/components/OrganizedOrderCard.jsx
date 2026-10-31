@@ -11,9 +11,7 @@ export default function OrganizedOrderCard({
     ocupado,
     onView,
     onEdit,
-    onReady,
-    onDeliver,
-    onReactivate,
+    onChangeState,
     onWhatsapp,
     onDelete,
 }) {
@@ -128,47 +126,24 @@ export default function OrganizedOrderCard({
             </div>
             <footer className="organized-card-footer">
                 <div className="organized-workflow">
-                    {antiguo ? (
+                    <button
+                        type="button"
+                        className="organized-primary"
+                        disabled={ocupado}
+                        onClick={() => onChangeState(pedido)}
+                    >
+                        <Icon name="checkCircle" />
+                        Cambiar estado
+                    </button>
+                    {pedido.estado === "Listo" && (
                         <button
                             type="button"
                             className="organized-secondary"
+                            aria-label="Avisar por WhatsApp"
                             disabled={ocupado}
-                            onClick={() => onReactivate(pedido)}
+                            onClick={() => onWhatsapp(pedido)}
                         >
-                            <Icon name="thread" />
-                            Reactivar
-                        </button>
-                    ) : pedido.estado === "Listo" ? (
-                        <>
-                            <button
-                                type="button"
-                                className="organized-primary"
-                                disabled={ocupado}
-                                onClick={() => onDeliver(pedido)}
-                            >
-                                <Icon name="check" />
-                                Marcar entregado
-                            </button>
-                            <button
-                                type="button"
-                                className="organized-secondary"
-                                aria-label="Avisar por WhatsApp"
-                                disabled={ocupado}
-                                onClick={() => onWhatsapp(pedido)}
-                            >
-                                <Icon name="message" />
-                                Avisar
-                            </button>
-                        </>
-                    ) : (
-                        <button
-                            type="button"
-                            className="organized-primary"
-                            disabled={ocupado}
-                            onClick={() => onReady(pedido)}
-                        >
-                            <Icon name="checkCircle" />
-                            Marcar listo
+                            <Icon name="message" /> Avisar
                         </button>
                     )}
                 </div>
