@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Calendar from "./pages/Calendar";
 import NewOrder from "./pages/NewOrder";
@@ -7,9 +7,19 @@ import Layout from "./components/Layout";
 
 import { supabase } from "./lib/supabase";
 import Earnings from "./pages/Earnings";
+import Settings from "./pages/Settings";
+import { navegar } from "./lib/navigation";
+import { seleccionPedido } from "./lib/orderRepository";
 
 function App() {
-    const [page, setPage] = useState("dashboard");
+    const [page, setPageActual] = useState("dashboard");
+    const [versionNavegacion, setVersionNavegacion] = useState(0);
+    const setPage = (pagina) => navegar(() => {
+        setPageActual(pagina);
+        setVersionNavegacion(version => version + 1);
+    });
+    const [errorCarga, setErrorCarga] = useState("");
+    const ultimaCarga = useRef(0);
 
     const [pedidos, setPedidos] = useState([]);
 
@@ -21,53 +31,28 @@ function App() {
     // =====================================================
 
     const cargarPedidos = () => {
-        return supabase
-            .from("pedidos")
-            .select(`
-                id,
-                tipo_prenda,
-                descripcion,
-                fecha_entrega,
-                precio,
-                sena,
-                estado,
-                prioridad,
-                notas,
-                pagado,
-
-                clientes (
-                    id,
-                    nombre,
-                    telefono
-                ),
-
-                pedido_prendas (
-                    id,
-                    tipo_prenda,
-                    cantidad,
-                    descripcion,
-                    precio
-                )
-            `)
-            .order("fecha_entrega", {
-                ascending: true,
-            })
+        const numeroCarga = ++ultimaCarga.current;
+        return supabase.from("pedidos").select(seleccionPedido)
+            .order("fecha_entrega", { ascending: true })
             .then(({ data, error }) => {
-
-                if (error) {
-                    console.error(
-                        "Error cargando pedidos:",
-                        error
-                    );
-
-                    setPedidos([]);
-                    setCargandoPedidos(false);
-                    return;
-                }
-
+                if (numeroCarga !== ultimaCarga.current) return;
+                if (error) throw error;
                 setPedidos(data || []);
-                setCargandoPedidos(false);
+                setErrorCarga("");
+            })
+            .catch((error) => {
+                if (numeroCarga !== ultimaCarga.current) return;
+                console.error("Error cargando pedidos:", error);
+                setErrorCarga("No pudimos actualizar los pedidos. Comprobá la conexión y reintentá. Si había datos cargados, seguimos mostrándolos.");
+            })
+            .finally(() => {
+                if (numeroCarga === ultimaCarga.current) setCargandoPedidos(false);
             });
+    };
+
+    const reintentarCarga = () => {
+        setCargandoPedidos(true);
+        cargarPedidos();
     };
 
     // =====================================================
@@ -107,6 +92,7 @@ function App() {
                     cargarPedidos();
                 }
             )
+            .on("postgres_changes", { event: "*", schema: "public", table: "clientes" }, () => cargarPedidos())
             .subscribe((status) => {
                 console.log(
                     "📡 Realtime:",
@@ -316,13 +302,21 @@ function App() {
     // NAVEGACIÓN
     // =====================================================
 
-    if (cargandoPedidos) {
-        return <Layout page={page} setPage={setPage}><p role="status">Cargando pedidos…</p></Layout>;
+    if (page === "settings") {
+        return <Layout page={page} setPage={setPage} errorCarga={errorCarga} onRetry={reintentarCarga}><Settings key={versionNavegacion} /></Layout>;
+    }
+
+    if (errorCarga && pedidos.length === 0 && page !== "new-order") {
+        return <Layout page={page} setPage={setPage} errorCarga={errorCarga} onRetry={reintentarCarga}><section className="connection-empty"><h1>No se pudieron cargar los pedidos</h1><p>Reintentá la carga para ver tus trabajos. No se borró ningún pedido.</p></section></Layout>;
+    }
+
+    if (cargandoPedidos && !errorCarga && pedidos.length === 0 && page !== "new-order") {
+        return <Layout page={page} setPage={setPage} errorCarga={errorCarga} onRetry={reintentarCarga}><p role="status">Cargando pedidos…</p></Layout>;
     }
 
     if (page === "new-order") {
         return (
-            <Layout
+            <Layout errorCarga={errorCarga} onRetry={reintentarCarga}
                 page="orders"
                 setPage={setPage}
             >
@@ -343,11 +337,11 @@ function App() {
         page === "orders-late"
     ) {
         return (
-            <Layout
+            <Layout errorCarga={errorCarga} onRetry={reintentarCarga}
                 page="orders"
                 setPage={setPage}
             >
-                <Orders
+                <Orders key={versionNavegacion}
                     pedidos={pedidos}
                     onBack={() =>
                         setPage(
@@ -372,11 +366,11 @@ function App() {
         page === "orders-today"
     ) {
         return (
-            <Layout
+            <Layout errorCarga={errorCarga} onRetry={reintentarCarga}
                 page="orders"
                 setPage={setPage}
             >
-                <Orders
+                <Orders key={versionNavegacion}
                     pedidos={pedidos}
                     onBack={() =>
                         setPage(
@@ -399,11 +393,11 @@ function App() {
 
     if (page === "orders") {
         return (
-            <Layout
+            <Layout errorCarga={errorCarga} onRetry={reintentarCarga}
                 page="orders"
                 setPage={setPage}
             >
-                <Orders
+                <Orders key={versionNavegacion}
                     pedidos={pedidos}
                     onBack={() =>
                         setPage(
@@ -425,7 +419,7 @@ function App() {
 
     if (page === "calendar") {
         return (
-            <Layout
+            <Layout errorCarga={errorCarga} onRetry={reintentarCarga}
                 page="calendar"
                 setPage={setPage}
             >
@@ -446,7 +440,7 @@ function App() {
     
     if (page === "earnings") {
         return (
-            <Layout page="earnings" setPage={setPage}>
+            <Layout errorCarga={errorCarga} onRetry={reintentarCarga} page="earnings" setPage={setPage}>
                 <Earnings pedidos={pedidos} />
             </Layout>
         );
@@ -458,7 +452,7 @@ function App() {
     // =====================================================
 
     return (
-        <Layout
+        <Layout errorCarga={errorCarga} onRetry={reintentarCarga}
             page="dashboard"
             setPage={setPage}
         >

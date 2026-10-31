@@ -380,3 +380,14 @@
         font-size: 11px;
     }
 }
+
+@media (max-width: 700px) {
+    .app-layout .sidebar-nav .menu-button { flex: 1; min-width: 0; }
+    .app-layout .sidebar-nav .menu-button span:last-child { font-size: 10px; max-width: 100%; overflow-wrap: anywhere; }
+}
+
+.app-layout .config-nav-short { display: none; }
+@media (max-width: 700px) {
+    .app-layout .sidebar-nav .menu-button .config-nav-full { display: none; }
+    .app-layout .sidebar-nav .menu-button .config-nav-short { display: inline; }
+}
