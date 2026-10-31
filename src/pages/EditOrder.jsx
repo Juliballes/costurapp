@@ -1,8 +1,14 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { totalPedido, resumenPago, subtotalPrenda, formatearDinero } from "../lib/orderTotals";
+import "./OrderForm.css";
 
-function EditOrder({ pedido, onBack, onSaved }) {
+function EditOrder(props) {
+    return <EditOrderForm key={props.pedido?.id} {...props} />;
+}
+
+function EditOrderForm({ pedido, onBack, onSaved }) {
     // =====================================================
     // DATOS DEL PEDIDO
     // =====================================================
@@ -17,10 +23,6 @@ function EditOrder({ pedido, onBack, onSaved }) {
 
     const [descripcion, setDescripcion] = useState(
         pedido?.descripcion || ""
-    );
-
-    const [precio, setPrecio] = useState(
-        pedido?.precio ?? ""
     );
 
     const [sena, setSena] = useState(
@@ -53,119 +55,11 @@ function EditOrder({ pedido, onBack, onSaved }) {
 
     const [guardando, setGuardando] = useState(false);
 
-    // =====================================================
-    // ACTUALIZAR DATOS CUANDO CAMBIA EL PEDIDO
-    // =====================================================
+    const precioNumerico = totalPedido(pedido);
+    const { sena: senaNumerica, saldo: saldoPendiente } = resumenPago({ ...pedido, sena, pagado });
 
-    useEffect(() => {
-        setTipoPrenda(
-            pedido?.tipo_prenda || ""
-        );
-
-        setFechaEntrega(
-            pedido?.fecha_entrega || ""
-        );
-
-        setDescripcion(
-            pedido?.descripcion || ""
-        );
-
-        setPrecio(
-            pedido?.precio ?? ""
-        );
-
-        setSena(
-            pedido?.sena ?? ""
-        );
-
-        setEstado(
-            pedido?.estado || "En proceso"
-        );
-
-        setPrioridad(
-            pedido?.prioridad || "Normal"
-        );
-
-        setNotas(
-            pedido?.notas || ""
-        );
-
-        setPagado(
-            Boolean(pedido?.pagado)
-        );
-    }, [pedido]);
-
-    // =====================================================
-    // PRECIO
-    // =====================================================
-
-    const precioNumerico =
-        Number(precio) || 0;
-
-    // =====================================================
-    // SEÑA
-    // =====================================================
-
-    const senaNumerica =
-        Number(sena) || 0;
-
-    // =====================================================
-    // SALDO
-    // =====================================================
-
-    const saldoPendiente = pagado
-        ? 0
-        : Math.max(
-              0,
-              precioNumerico -
-                  senaNumerica
-          );
-
-    // =====================================================
-    // CAMBIAR ESTADO DE PAGO
-    // =====================================================
-
-    const cambiarEstadoPago = (
-        nuevoEstado
-    ) => {
-        if (
-            nuevoEstado === "pagado"
-        ) {
-            setPagado(true);
-
-            // Si queda pagado,
-            // la seña representa el total.
-            setSena(
-                String(
-                    precioNumerico
-                )
-            );
-
-            return;
-        }
-
-        // Volver a pendiente
-        setPagado(false);
-    };
-
-    // =====================================================
-    // CAMBIAR PRECIO
-    // =====================================================
-
-    const manejarCambioPrecio = (
-        valor
-    ) => {
-        setPrecio(valor);
-
-        // Si estaba pagado,
-        // mantenemos la seña igual al nuevo total.
-        if (pagado) {
-            setSena(
-                String(
-                    Number(valor) || 0
-                )
-            );
-        }
+    const cambiarEstadoPago = (nuevoEstado) => {
+        setPagado(nuevoEstado === "pagado");
     };
 
     // =====================================================
@@ -547,6 +441,17 @@ function EditOrder({ pedido, onBack, onSaved }) {
                         💰 Información de pago
                     </h2>
 
+                    {pedido.pedido_prendas?.length > 0 && (
+                        <div className="payment-breakdown">
+                            {pedido.pedido_prendas.map((prenda) => (
+                                <div key={prenda.id}>
+                                    <span>{prenda.tipo_prenda} · {prenda.cantidad} × {formatearDinero(prenda.precio)}</span>
+                                    <strong>{formatearDinero(subtotalPrenda(prenda))}</strong>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     {/* TOTAL / SEÑA / SALDO */}
 
                     <div className="payment-summary">
@@ -576,7 +481,7 @@ function EditOrder({ pedido, onBack, onSaved }) {
                                 type="number"
                                 min="0"
                                 step="0.01"
-                                value={sena}
+                                value={pagado ? precioNumerico : sena}
                                 onChange={(e) => {
                                     const valor =
                                         e.target.value;

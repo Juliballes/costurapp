@@ -387,7 +387,7 @@
     gap: 12px;
 }
 
-.detail-garment-card {
+.order-detail-page .detail-garment-card {
     position: relative;
 
     display: grid;
@@ -413,7 +413,7 @@
         transform 0.2s ease;
 }
 
-.detail-garment-card:hover {
+.order-detail-page .detail-garment-card:hover {
     border-color: var(--accent-border);
 
     background: #fffafd;
@@ -430,7 +430,7 @@
     font-weight: 800;
 }
 
-.detail-garment-icon {
+.order-detail-page .detail-garment-icon {
     width: 55px;
     height: 55px;
 
@@ -477,7 +477,7 @@
     color: var(--accent-dark);
 }
 
-.detail-garment-price {
+.order-detail-page .detail-garment-price {
     flex-shrink: 0;
 
     color: #494250;
@@ -841,7 +841,7 @@
         grid-template-columns: 1fr;
     }
 
-    .detail-garment-card {
+    .order-detail-page .detail-garment-card {
         grid-template-columns:
             48px
             minmax(0, 1fr);
@@ -851,7 +851,7 @@
         display: none;
     }
 
-    .detail-garment-icon {
+    .order-detail-page .detail-garment-icon {
         width: 48px;
         height: 48px;
     }
@@ -860,7 +860,21 @@
         flex-direction: column;
     }
 
-    .detail-garment-price {
+    .order-detail-page .detail-garment-price {
         align-self: flex-start;
     }
+}
+.order-detail-page .detail-garment-price small {
+    display: block;
+    margin-top: 4px;
+    color: #75646e;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.order-detail-page .detail-garment-price {
+    grid-column: auto;
+    min-width: 0;
+    padding-top: 0;
+    border-top: 0;
 }

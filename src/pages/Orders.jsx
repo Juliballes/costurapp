@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { resumenPago, subtotalPrenda } from "../lib/orderTotals";
+import { mensajeRetiro } from "../lib/whatsapp";
 
 import EditOrder from "./EditOrder";
 import OrderDetail from "./OrderDetail";
@@ -220,14 +222,7 @@ function Orders({
             return null;
         }
 
-        const nombre =
-            pedido?.clientes?.nombre ||
-            "cliente";
-
-        const mensaje =
-            `Hola ${nombre} 😊\n\n` +
-            `Tu pedido ya está listo para retirar.\n\n` +
-            `¡Muchas gracias! 🧵🌸`;
+        const mensaje = mensajeRetiro(pedido?.clientes?.nombre);
 
         return `https://wa.me/${numero}?text=${encodeURIComponent(
             mensaje
@@ -458,9 +453,7 @@ function Orders({
                     await refrescarApp();
                 }}
 
-                onSaved={async (
-                    pedidoActualizado
-                ) => {
+                onSaved={async () => {
                     setPedidoSeleccionado(
                         null
                     );
@@ -484,9 +477,7 @@ function Orders({
                     setPedidoDetalle(null);
                 }}
 
-                onSaved={async (
-                    pedidoActualizado
-                ) => {
+                onSaved={async (pedidoActualizado) => {
                     setPedidoDetalle(
                         pedidoActualizado
                     );
@@ -725,18 +716,7 @@ function Orders({
                     {pedidosFiltrados.map(
                         (pedido) => {
 
-                            const precio =
-                                Number(
-                                    pedido.precio
-                                ) || 0;
-
-                            const sena =
-                                Number(
-                                    pedido.sena
-                                ) || 0;
-
-                            const saldo =
-                                precio - sena;
+                            const { total: precio, saldo } = resumenPago(pedido);
 
                             const actualizando =
                                 actualizandoPedidoId ===
@@ -834,7 +814,7 @@ function Orders({
                                                                         {
                                                                             prenda.cantidad
                                                                         }
-
+                                                                        <small className="order-line-subtotal"> · {formatearDinero(subtotalPrenda(prenda))}</small>
                                                                     </strong>
 
                                                                     <span>
@@ -1072,6 +1052,11 @@ function Orders({
                             </strong>{" "}
                             ya está listo para retirar.
                         </p>
+
+                        <div className="whatsapp-preview">
+                            <span>Mensaje para tu cliente</span>
+                            <p>{mensajeRetiro(pedidoListo.clientes?.nombre)}</p>
+                        </div>
 
                         {crearEnlaceWhatsapp(
                             pedidoListo

@@ -1,6 +1,8 @@
 
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { subtotalPrenda, totalPrendas, resumenPago, formatearDinero } from "../lib/orderTotals";
+import "./OrderForm.css";
 
 function NewOrder({ onBack, onOrderCreated }) {
     // =====================================================
@@ -23,9 +25,9 @@ function NewOrder({ onBack, onOrderCreated }) {
     // PRENDAS
     // =====================================================
 
-    const [prendas, setPrendas] = useState([
+    const [prendas, setPrendas] = useState(() => [
         {
-            id: Date.now(),
+            id: crypto.randomUUID(),
             tipoPrenda: "",
             cantidad: 1,
             descripcion: "",
@@ -94,7 +96,7 @@ function NewOrder({ onBack, onOrderCreated }) {
         setPrendas((actuales) => [
             ...actuales,
             {
-                id: Date.now() + Math.random(),
+                id: crypto.randomUUID(),
                 tipoPrenda: "",
                 cantidad: 1,
                 descripcion: "",
@@ -124,7 +126,7 @@ function NewOrder({ onBack, onOrderCreated }) {
     const cambiarCantidad = (id, cantidad) => {
         const nuevaCantidad = Math.max(
             1,
-            Number(cantidad) || 1
+            Math.trunc(Number(cantidad)) || 1
         );
 
         actualizarPrenda(
@@ -138,107 +140,19 @@ function NewOrder({ onBack, onOrderCreated }) {
     // TOTAL DEL PEDIDO
     // =====================================================
 
-    const precioTotal = prendas.reduce(
-        (total, prenda) => {
-            const precioUnitario =
-                Number(prenda.precio) || 0;
-
-            const cantidad =
-                Number(prenda.cantidad) || 1;
-
-            return (
-                total +
-                precioUnitario * cantidad
-            );
-        },
-        0
-    );
-
-    // =====================================================
-    // SEÑA
-    // =====================================================
-
-    const senaNumerica = Number(sena) || 0;
-
-    // =====================================================
-    // SALDO
-    // =====================================================
-
-    const saldoPendiente = pagado
-        ? 0
-        : Math.max(
-              0,
-              precioTotal - senaNumerica
-          );
-
-    // =====================================================
-    // MARCAR PAGADO
-    // =====================================================
+    const precioTotal = totalPrendas(prendas);
+    const { sena: senaNumerica, saldo: saldoPendiente } = resumenPago({
+        pedido_prendas: prendas,
+        sena,
+        pagado,
+    });
 
     const cambiarEstadoPago = (nuevoEstado) => {
-        if (nuevoEstado === "pagado") {
-            setPagado(true);
-            setSena(String(precioTotal));
-        } else {
-            setPagado(false);
-
-            setSena((valorActual) => {
-                const valor =
-                    Number(valorActual) || 0;
-
-                return valor > precioTotal
-                    ? String(precioTotal)
-                    : valorActual;
-            });
-        }
+        setPagado(nuevoEstado === "pagado");
     };
 
-    // =====================================================
-    // CUANDO CAMBIA EL TOTAL
-    // =====================================================
-
-    const manejarCambioPrecio = (
-        id,
-        valor
-    ) => {
-        actualizarPrenda(
-            id,
-            "precio",
-            valor
-        );
-
-        if (pagado) {
-            const nuevoPrecioTotal =
-                prendas.reduce(
-                    (total, prenda) => {
-                        const precioActual =
-                            prenda.id === id
-                                ? Number(valor) ||
-                                  0
-                                : Number(
-                                      prenda.precio
-                                  ) || 0;
-
-                        const cantidad =
-                            Number(
-                                prenda.cantidad
-                            ) || 1;
-
-                        return (
-                            total +
-                            precioActual *
-                                cantidad
-                        );
-                    },
-                    0
-                );
-
-            setSena(
-                String(
-                    nuevoPrecioTotal
-                )
-            );
-        }
+    const manejarCambioPrecio = (id, valor) => {
+        actualizarPrenda(id, "precio", valor);
     };
 
     // =====================================================
@@ -300,7 +214,7 @@ function NewOrder({ onBack, onOrderCreated }) {
         const algunPrecioInvalido =
             prendas.some(
                 (prenda) =>
-                    Number(prenda.precio) < 0
+                    !Number.isFinite(Number(prenda.precio)) || Number(prenda.precio) < 0
             );
 
         if (algunPrecioInvalido) {
@@ -544,9 +458,7 @@ function NewOrder({ onBack, onOrderCreated }) {
 
             setPrendas([
                 {
-                    id:
-                        Date.now() +
-                        Math.random(),
+                    id: crypto.randomUUID(),
                     tipoPrenda: "",
                     cantidad: 1,
                     descripcion: "",
@@ -840,13 +752,14 @@ function NewOrder({ onBack, onOrderCreated }) {
                                         </div>
 
                                         <div className="form-group">
-                                            <label>
+                                            <label htmlFor={`cantidad-${prenda.id}`}>
                                                 Cantidad
                                             </label>
 
                                             <div className="quantity-control">
                                                 <button
                                                     type="button"
+                                                    aria-label={`Quitar una unidad del trabajo ${index + 1}`}
                                                     onClick={() =>
                                                         cambiarCantidad(
                                                             prenda.id,
@@ -863,14 +776,19 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                     −
                                                 </button>
 
-                                                <span>
-                                                    {
-                                                        prenda.cantidad
-                                                    }
-                                                </span>
+                                                <input
+                                                    id={`cantidad-${prenda.id}`}
+                                                    type="number"
+                                                    min="1"
+                                                    step="1"
+                                                    value={prenda.cantidad}
+                                                    onChange={(e) => cambiarCantidad(prenda.id, e.target.value)}
+                                                    disabled={guardando}
+                                                />
 
                                                 <button
                                                     type="button"
+                                                    aria-label={`Agregar una unidad al trabajo ${index + 1}`}
                                                     onClick={() =>
                                                         cambiarCantidad(
                                                             prenda.id,
@@ -918,7 +836,7 @@ function NewOrder({ onBack, onOrderCreated }) {
                                         </div>
 
                                         <div className="form-group">
-                                            <label>
+                                            <label htmlFor={`precio-${prenda.id}`}>
                                                 Precio por unidad
                                             </label>
 
@@ -926,6 +844,7 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
+                                                id={`precio-${prenda.id}`}
                                                 placeholder="$ 0"
                                                 value={
                                                     prenda.precio
@@ -945,25 +864,10 @@ function NewOrder({ onBack, onOrderCreated }) {
                                                 }
                                             />
 
-                                            <small className="form-help">
-                                                Total de esta
-                                                prenda:{" "}
-                                                <strong>
-                                                    $
-                                                    {(
-                                                        (Number(
-                                                            prenda.precio
-                                                        ) ||
-                                                            0) *
-                                                        (Number(
-                                                            prenda.cantidad
-                                                        ) ||
-                                                            1)
-                                                    ).toLocaleString(
-                                                        "es-AR"
-                                                    )}
-                                                </strong>
-                                            </small>
+                                            <div className="line-subtotal" aria-live="polite">
+                                                <span>{prenda.cantidad} × {formatearDinero(prenda.precio)} por unidad</span>
+                                                <strong>{formatearDinero(subtotalPrenda(prenda))}</strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1040,7 +944,7 @@ function NewOrder({ onBack, onOrderCreated }) {
                                 min="0"
                                 step="0.01"
                                 placeholder="$ 0"
-                                value={sena}
+                                value={pagado ? precioTotal : sena}
                                 onChange={(e) => {
                                     const valor =
                                         e.target
@@ -1238,6 +1142,10 @@ function NewOrder({ onBack, onOrderCreated }) {
                 ========================================= */}
 
                 <div className="form-actions">
+                    <div className="form-total" aria-live="polite">
+                        <span>Total · {prendas.reduce((total, prenda) => total + prenda.cantidad, 0)} unidades</span>
+                        <strong>{formatearDinero(precioTotal)}</strong>
+                    </div>
                     <button
                         type="button"
                         className="cancel-button"

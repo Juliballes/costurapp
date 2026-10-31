@@ -2372,3 +2372,38 @@
         font-size: 11px;
     }
 }
+.order-line-subtotal {
+    color: #79405b;
+    font-size: 13px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.whatsapp-preview {
+    margin: 18px 0;
+    padding: 16px;
+    border: 1px solid #dce9df;
+    border-radius: 14px;
+    background: #f2f8f3;
+    text-align: left;
+}
+
+.whatsapp-preview > span {
+    color: #496452;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.whatsapp-preview p {
+    margin: 10px 0 0;
+    color: #304637;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.ready-modal {
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+}

@@ -20,10 +20,8 @@ function App() {
     // CARGAR PEDIDOS
     // =====================================================
 
-    const cargarPedidos = async () => {
-        setCargandoPedidos(true);
-
-        const { data, error } = await supabase
+    const cargarPedidos = () => {
+        return supabase
             .from("pedidos")
             .select(`
                 id,
@@ -35,6 +33,7 @@ function App() {
                 estado,
                 prioridad,
                 notas,
+                pagado,
 
                 clientes (
                     id,
@@ -52,21 +51,23 @@ function App() {
             `)
             .order("fecha_entrega", {
                 ascending: true,
+            })
+            .then(({ data, error }) => {
+
+                if (error) {
+                    console.error(
+                        "Error cargando pedidos:",
+                        error
+                    );
+
+                    setPedidos([]);
+                    setCargandoPedidos(false);
+                    return;
+                }
+
+                setPedidos(data || []);
+                setCargandoPedidos(false);
             });
-
-        if (error) {
-            console.error(
-                "Error cargando pedidos:",
-                error
-            );
-
-            setPedidos([]);
-            setCargandoPedidos(false);
-            return;
-        }
-
-        setPedidos(data || []);
-        setCargandoPedidos(false);
     };
 
     // =====================================================
@@ -314,6 +315,10 @@ function App() {
     // =====================================================
     // NAVEGACIÓN
     // =====================================================
+
+    if (cargandoPedidos) {
+        return <Layout page={page} setPage={setPage}><p role="status">Cargando pedidos…</p></Layout>;
+    }
 
     if (page === "new-order") {
         return (

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { resumenPago, subtotalPrenda } from "../lib/orderTotals";
 
 import EditOrder from "./EditOrder";
 
@@ -77,18 +78,7 @@ function OrderDetail({
     const prendas =
         pedidoActual.pedido_prendas || [];
 
-    const precio =
-        Number(
-            pedidoActual.precio
-        ) || 0;
-
-    const sena =
-        Number(
-            pedidoActual.sena
-        ) || 0;
-
-    const saldo =
-        precio - sena;
+    const { total: precio, sena, saldo } = resumenPago(pedidoActual);
 
     const formatearFecha = (
         fecha
@@ -182,16 +172,6 @@ function OrderDetail({
 
         return "detail-status-process";
     };
-
-    const totalPrendas =
-        prendas.reduce(
-            (total, prenda) =>
-                total +
-                (Number(
-                    prenda.precio
-                ) || 0),
-            0
-        );
 
     const totalUnidades =
         prendas.reduce(
@@ -505,8 +485,9 @@ function OrderDetail({
                                                 <div className="detail-garment-price">
 
                                                     {formatearDinero(
-                                                        prenda.precio
+                                                        subtotalPrenda(prenda)
                                                     )}
+                                                    <small>{prenda.cantidad} × {formatearDinero(prenda.precio)} por unidad</small>
 
                                                 </div>
 
