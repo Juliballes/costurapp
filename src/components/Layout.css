@@ -335,3 +335,48 @@
         padding: 24px 16px;
     }
 }
+/* El menú comparte estilos globales antiguos; limitar sus medidas al layout. */
+.app-layout > .sidebar {
+    position: sticky;
+    align-self: flex-start;
+    min-height: 0;
+    bottom: auto;
+}
+
+.app-layout .logo {
+    margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+    .app-layout > .sidebar {
+        height: auto;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .app-layout .logo {
+        justify-content: flex-start;
+        padding: 2px 4px 10px;
+    }
+
+    .app-layout .logo h2 {
+        display: block;
+        font-size: 16px;
+    }
+
+    .app-layout .sidebar-nav {
+        flex-direction: row;
+    }
+
+    .app-layout .sidebar-nav .menu-button {
+        flex-direction: column;
+        gap: 3px;
+        min-height: 48px;
+        padding: 6px 4px;
+    }
+
+    .app-layout .sidebar-nav .menu-button span:last-child {
+        display: inline;
+        font-size: 11px;
+    }
+}

@@ -1,0 +1,130 @@
+/* Importes y controles compartidos por alta y edición. */
+.new-order-page .form-section {
+    border-color: #e8dfe5;
+    box-shadow: 0 4px 18px rgb(73 43 59 / 4%);
+}
+
+.new-order-page .garment-card {
+    background: #fffcfd;
+    box-shadow: none;
+    border-left: 4px solid var(--accent-border);
+}
+
+.new-order-page .quantity-control input {
+    width: 64px;
+    min-height: 44px;
+    padding: 6px;
+    border: 0;
+    border-radius: 0;
+    background: white;
+    font-weight: 750;
+    text-align: center;
+    appearance: textfield;
+}
+
+.quantity-control input::-webkit-inner-spin-button,
+.quantity-control input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+.new-order-page .line-subtotal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #f2e7ed;
+    color: #654052;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.line-subtotal strong {
+    font-size: 19px;
+}
+
+.new-order-page .payment-summary-item:first-child {
+    border-color: var(--accent-border);
+    background: #f7edf2;
+}
+
+.new-order-page .payment-summary-item:first-child strong {
+    font-size: 26px;
+    color: #79405b;
+}
+
+.new-order-page .form-actions {
+    position: sticky;
+    bottom: 12px;
+    z-index: 5;
+    align-items: center;
+    box-shadow: 0 6px 30px rgb(73 43 59 / 12%);
+}
+
+.form-total {
+    margin-right: auto;
+    font-variant-numeric: tabular-nums;
+}
+
+.form-total span,
+.form-total strong {
+    display: block;
+}
+
+.form-total span {
+    color: #72636c;
+    font-size: 12px;
+}
+
+.form-total strong {
+    font-size: 23px;
+    color: #79405b;
+}
+
+.payment-breakdown {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #fbf7f9;
+}
+
+.payment-breakdown > div {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.new-order-page :is(button, input, select, textarea):focus-visible {
+    outline: 3px solid #9d5879;
+    outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+    .new-order-page .form-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        bottom: 8px;
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .form-total {
+        flex-basis: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .new-order-page .form-actions button {
+        flex: 1;
+        width: auto;
+        min-height: 46px;
+    }
+}

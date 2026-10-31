@@ -1,16 +1,45 @@
-# React + Vite
+# CosturApp · Mhome
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación para organizar pedidos del taller, entregas, pagos y avisos de retiro por WhatsApp.
 
-Currently, two official plugins are available:
+## Ejecutar localmente
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Requiere Node.js 22.12 o superior y la base de Supabase que ya utiliza el taller.
 
-## React Compiler
+1. Ejecutar `npm ci`.
+2. Crear `.env.local` con las variables del proyecto:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+   ```env
+   VITE_SUPABASE_URL=https://TU_PROYECTO.supabase.co
+   VITE_SUPABASE_PUBLISHABLE_KEY=TU_CLAVE_PUBLICABLE
+   ```
 
-## Expanding the ESLint configuration
+3. Ejecutar `npm run dev` y abrir la dirección que indica Vite.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Se utilizan las tablas existentes `clientes`, `pedidos` y `pedido_prendas`. Este cambio no requiere migraciones ni modifica datos automáticamente.
+
+## Verificar cambios
+
+- `npm test`: pruebas de cantidades, centavos, señas, pedidos pagados, compatibilidad con pedidos antiguos y mensaje de retiro.
+- `npm run lint`: revisión estática.
+- `npm run build`: compilación para producción.
+
+Para probar el recorrido: crear un pedido con 3 pantalones a $1.500 por unidad; el subtotal y el total deben ser $4.500. Con una seña de $1.000, el saldo debe ser $3.500. Al marcarlo como pagado, la seña debe acompañar el total incluso si se cambia la cantidad o se agrega o elimina otro trabajo. Guardar, abrir el detalle y comprobar los mismos importes. Al marcar el pedido como listo, revisar la vista previa y el enlace de WhatsApp antes de enviar.
+
+## Importes y mensaje
+
+`pedido_prendas.precio` contiene el **precio unitario**. El total se calcula como la suma de `cantidad × precio` de todos los trabajos, con cálculos en centavos. Se usa el mismo cálculo en alta, edición, lista, detalle y Ganancias. Los pedidos antiguos que no tienen detalle conservan `pedidos.precio`. Si un pedido con detalle tiene un total guardado desactualizado, la app muestra el total calculado y lo guarda en `pedidos.precio` al editar ese pedido.
+
+Los pedidos pagados tienen saldo cero y su seña representa el total. El campo `pagado` se carga junto con los demás datos para conservar el estado al recargar.
+
+El aviso usa el nombre del cliente automáticamente, conserva los saltos de línea y abre WhatsApp con este texto preparado:
+
+```text
+Hola [nombre]👋🏻 soy Mariana de Mhome
+
+Tu prenda ya está lista para retirar.
+
+¡Muchas gracias! 🥰.
+```
+
+El envío lo confirma la persona desde WhatsApp.

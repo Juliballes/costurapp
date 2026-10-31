@@ -15,7 +15,7 @@ function Layout({ page, setPage, children }) {
 
                     <div className="logo-text">
                         <h2>CosturApp</h2>
-                        <span>Taller de costura</span>
+                        <span>Mhome · Taller de costura</span>
                     </div>
                 </div>
 

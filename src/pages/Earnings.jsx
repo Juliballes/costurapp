@@ -1,5 +1,6 @@
 
 import { useMemo, useState } from "react";
+import { resumenPago } from "../lib/orderTotals";
 
 function Earnings({ pedidos = [] }) {
     // Calcula el lunes de la semana actual.
@@ -50,26 +51,21 @@ function Earnings({ pedidos = [] }) {
         });
 
         const totalTrabajos = deLaSemana.reduce(
-            (suma, pedido) => suma + Number(pedido.precio || 0),
+            (suma, pedido) => suma + resumenPago(pedido).total,
             0
         );
 
         const senas = deLaSemana.reduce(
-            (suma, pedido) => suma + Number(pedido.sena || 0),
+            (suma, pedido) => suma + resumenPago(pedido).sena,
             0
         );
 
         const pendientes = deLaSemana.filter((pedido) => {
-            const precio = Number(pedido.precio || 0);
-            const sena = Number(pedido.sena || 0);
-
-            return precio - sena > 0;
+            return resumenPago(pedido).saldo > 0;
         });
 
         const saldoPendiente = deLaSemana.reduce((suma, pedido) => {
-            const precio = Number(pedido.precio || 0);
-            const sena = Number(pedido.sena || 0);
-            const saldo = Math.max(0, precio - sena);
+            const { saldo } = resumenPago(pedido);
 
             return suma + saldo;
         }, 0);
@@ -220,9 +216,7 @@ function Earnings({ pedidos = [] }) {
                 ) : (
                     <div className="orders-list">
                         {resumen.deLaSemana.map((pedido) => {
-                            const precio = Number(pedido.precio || 0);
-                            const sena = Number(pedido.sena || 0);
-                            const saldo = Math.max(0, precio - sena);
+                            const { total: precio, sena, saldo } = resumenPago(pedido);
 
                             return (
                                 <div
