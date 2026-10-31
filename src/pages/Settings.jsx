@@ -1,3 +1,4 @@
+import Icon from "../components/Icon";
 import { useState } from "react";
 import {
     configuracionInicial,
@@ -51,7 +52,7 @@ export default function Settings() {
         <div className="new-order-page settings-page">
             <header className="page-header">
                 <div>
-                    <h1>Configuración ⚙️</h1>
+                    <h1>Configuración</h1>
                     <p>Personalizá cómo se presenta tu taller.</p>
                 </div>
             </header>
@@ -67,7 +68,7 @@ export default function Settings() {
                     </div>
                 )}
                 <section className="form-section">
-                    <h2>🧵 Tu taller</h2>
+                    <h2><Icon name="thread" /> Tu taller</h2>
                     <div className="form-grid">
                         {[
                             ["taller", "Nombre del taller"],
@@ -103,7 +104,7 @@ export default function Settings() {
                     </div>
                 </section>
                 <section className="form-section">
-                    <h2>💬 Aviso de retiro</h2>
+                    <h2><Icon name="message" /> Aviso de retiro</h2>
                     <div className="form-group">
                         <label htmlFor="config-plantilla">
                             Mensaje de WhatsApp

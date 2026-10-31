@@ -1,3 +1,4 @@
+import Icon, { GarmentIcon } from "./components/Icon";
 import { useEffect, useRef, useState } from "react";
 
 import Calendar from "./pages/Calendar";
@@ -9,9 +10,11 @@ import { supabase } from "./lib/supabase";
 import Earnings from "./pages/Earnings";
 import Settings from "./pages/Settings";
 import { navegar } from "./lib/navigation";
+import { useWorkshopSettings } from "./hooks/useWorkshopSettings";
 import { seleccionPedido } from "./lib/orderRepository";
 
 function App() {
+    const configuracion = useWorkshopSettings();
     const [page, setPageActual] = useState("dashboard");
     const [versionNavegacion, setVersionNavegacion] = useState(0);
     const setPage = (pagina) => navegar(() => {
@@ -221,30 +224,7 @@ function App() {
     // ICONO PRENDA
     // =====================================================
 
-    const obtenerIcono = (tipo) => {
-        switch (tipo) {
-            case "Vestido":
-                return "👗";
-
-            case "Pantalón":
-                return "👖";
-
-            case "Blusa":
-                return "👚";
-
-            case "Camisa":
-                return "👔";
-
-            case "Saco":
-                return "🧥";
-
-            case "Falda":
-                return "👗";
-
-            default:
-                return "🧵";
-        }
-    };
+    const obtenerIcono = (tipo) => <GarmentIcon tipo={tipo} />;
 
     // =====================================================
     // PRENDAS DE UN PEDIDO
@@ -278,24 +258,24 @@ function App() {
             pedido.prioridad ===
             "Urgente"
         ) {
-            return "🔴 Urgente";
+            return "Urgente";
         }
 
         if (
             pedido.estado ===
             "Listo"
         ) {
-            return "🟢 Listo";
+            return "Listo";
         }
 
         if (
             pedido.estado ===
             "Entregado"
         ) {
-            return "⚪ Entregado";
+            return "Entregado";
         }
 
-        return "🟡 En proceso";
+        return "En proceso";
     };
 
     // =====================================================
@@ -463,41 +443,16 @@ function App() {
                 ========================================= */}
 
                 <header className="dashboard-welcome">
-
-                    <div>
-                        <span className="dashboard-eyebrow">
-                            COSTURAPP
-                        </span>
-
-                        <h1>
-                            Buenos días, mamá 🌸
-                        </h1>
-
-                        <p>
-                            Acá tenés lo más importante
-                            de tu taller.
-                        </p>
+                    <div className="welcome-copy">
+                        <span className="dashboard-eyebrow">HOLA, {configuracion.remitente.toUpperCase()}</span>
+                        <h1>Tu taller, al día.</h1>
+                        <p>Organizá los trabajos de hoy y prepará las próximas entregas.</p>
                     </div>
-
-                    <div className="dashboard-date">
-
-                        <span>
-                            📅 Hoy
-                        </span>
-
-                        <strong>
-                            {hoy.toLocaleDateString(
-                                "es-AR",
-                                {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric",
-                                }
-                            )}
-                        </strong>
-
+                    <div className="welcome-actions">
+                        <div className="dashboard-date"><Icon name="calendar"/><div><span>Hoy en tu taller</span><strong>{hoy.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}</strong></div></div>
+                        <button type="button" className="dashboard-new-order-button" onClick={() => setPage("new-order")}><Icon name="plus"/>Nuevo pedido</button>
                     </div>
-
+                    <div className="hero-stitch" aria-hidden="true"><Icon name="scissors"/></div>
                 </header>
 
                 {/* =========================================
@@ -515,7 +470,7 @@ function App() {
                     >
 
                         <div className="dashboard-stat-icon">
-                            🔴
+                            <Icon name="alert" />
                         </div>
 
                         <div>
@@ -547,7 +502,7 @@ function App() {
                     >
 
                         <div className="dashboard-stat-icon">
-                            📅
+                            <Icon name="calendar" />
                         </div>
 
                         <div>
@@ -577,7 +532,7 @@ function App() {
                     >
 
                         <div className="dashboard-stat-icon">
-                            🧵
+                            <Icon name="thread" />
                         </div>
 
                         <div>
@@ -607,7 +562,7 @@ function App() {
                     >
 
                         <div className="dashboard-stat-icon">
-                            ✅
+                            <Icon name="checkCircle" />
                         </div>
 
                         <div>
@@ -640,8 +595,8 @@ function App() {
 
                         <div className="dashboard-section-title">
 
-                            <div className="dashboard-section-icon late">
-                                🔴
+                            <div className={`dashboard-section-icon ${pedidosAtrasados.length > 0 ? "late" : "ready"}`}>
+                                <Icon name={pedidosAtrasados.length > 0 ? "alert" : "checkCircle"} />
                             </div>
 
                             <div>
@@ -771,7 +726,7 @@ function App() {
                                                 </div>
 
                                                 <div className="dashboard-overdue-badge">
-                                                    ⏰{" "}
+                                                    <Icon name="clock" />{" "}
                                                     {diferencia ===
                                                     1
                                                         ? "1 día"
@@ -790,7 +745,7 @@ function App() {
 
                         <div className="dashboard-empty-state">
                             <span>
-                                ✅
+                                <Icon name="checkCircle" />
                             </span>
 
                             <div>
@@ -823,7 +778,7 @@ function App() {
                             <div className="dashboard-section-title">
 
                                 <div className="dashboard-section-icon today">
-                                    📅
+                                    <Icon name="calendar" />
                                 </div>
 
                                 <div>
@@ -833,7 +788,7 @@ function App() {
                                     </h2>
 
                                     <p>
-                                        Lo que tu mamá tiene que entregar hoy.
+                                        Los pedidos que tenés que entregar hoy.
                                     </p>
 
                                 </div>
@@ -935,7 +890,7 @@ function App() {
 
                             <div className="dashboard-empty-state">
                                 <span>
-                                    🌸
+                                    <Icon name="flower" />
                                 </span>
 
                                 <div>
@@ -967,7 +922,7 @@ function App() {
                     >
 
                         <div className="reminder-bell">
-                            🔔
+                            <Icon name="bell" />
                         </div>
 
                         <div className="reminder-card-content">
@@ -981,7 +936,7 @@ function App() {
                                 listos > 0 ||
                                 pedidosAtrasados.length >
                                     0
-                                    ? "Hay cosas para mirar"
+                                    ? "Un vistazo a tus pendientes"
                                     : "Todo al día"}
                             </h2>
 
@@ -1007,7 +962,7 @@ function App() {
                                             )
                                         }
                                     >
-                                        🔴{" "}
+                                        <Icon name="alert" />{" "}
                                         <strong>
                                             {pedidosAtrasados.length}
                                         </strong>{" "}
@@ -1027,7 +982,7 @@ function App() {
                                             )
                                         }
                                     >
-                                        ⚠️{" "}
+                                        <Icon name="alert" />{" "}
                                         <strong>
                                             {urgentes}
                                         </strong>{" "}
@@ -1047,11 +1002,11 @@ function App() {
                                             )
                                         }
                                     >
-                                        ✅{" "}
+                                        <Icon name="checkCircle" />{" "}
                                         <strong>
                                             {listos}
                                         </strong>{" "}
-                                        listos para retirar
+                                        {listos === 1 ? "listo para retirar" : "listos para retirar"}
                                     </button>
 
                                 )}
@@ -1075,7 +1030,7 @@ function App() {
                         <div className="dashboard-section-title">
 
                             <div className="dashboard-section-icon upcoming">
-                                🧵
+                                <Icon name="thread" />
                             </div>
 
                             <div>
@@ -1196,7 +1151,7 @@ function App() {
 
                         <div className="dashboard-empty-state">
                             <span>
-                                🧵
+                                <Icon name="thread" />
                             </span>
 
                             <div>
@@ -1218,21 +1173,7 @@ function App() {
                     NUEVO PEDIDO
                 ========================================= */}
 
-                <div className="dashboard-bottom-action">
 
-                    <button
-                        type="button"
-                        className="dashboard-new-order-button"
-                        onClick={() =>
-                            setPage(
-                                "new-order"
-                            )
-                        }
-                    >
-                        ＋ Nuevo pedido
-                    </button>
-
-                </div>
 
             </div>
         </Layout>

@@ -1,3 +1,4 @@
+import Icon, { GarmentIcon } from "../components/Icon";
 
 import { useMemo, useState } from "react";
 import "./Calendar.css";
@@ -153,30 +154,7 @@ function Calendar({ pedidos = [], onBack, onEditOrder }) {
   // ICONO SEGÚN PRENDA
   // =========================================
 
-  const obtenerIconoPrenda = (tipoPrenda) => {
-    switch (tipoPrenda) {
-      case "Vestido":
-        return "👗";
-
-      case "Pantalón":
-        return "👖";
-
-      case "Blusa":
-        return "👚";
-
-      case "Camisa":
-        return "👔";
-
-      case "Saco":
-        return "🧥";
-
-      case "Falda":
-        return "👗";
-
-      default:
-        return "🧵";
-    }
-  };
+  const obtenerIconoPrenda = (tipoPrenda) => <GarmentIcon tipo={tipoPrenda} />;
 
   // =========================================
   // CLASE DEL ESTADO
@@ -216,7 +194,7 @@ function Calendar({ pedidos = [], onBack, onEditOrder }) {
             <div className="calendar-title-row">
 
               <span className="calendar-title-icon">
-                📅
+                <Icon name="calendar" />
               </span>
 
               <h1>Calendario</h1>
@@ -527,7 +505,7 @@ function Calendar({ pedidos = [], onBack, onEditOrder }) {
                 <div className="no-orders">
 
                   <div className="no-orders-icon">
-                    📭
+                    <Icon name="orders" />
                   </div>
 
                   <h4>
@@ -637,13 +615,13 @@ function Calendar({ pedidos = [], onBack, onEditOrder }) {
                             >
                               {pedido.estado ===
                               "Entregado"
-                                ? "⚪ Entregado"
+                                ? "Entregado"
                                 : pedido.estado ===
                                   "Listo"
-                                ? "🟢 Listo"
+                                ? "Listo"
                                 : pedido.estado ===
                                   "En proceso"
-                                ? "🟡 En proceso"
+                                ? "En proceso"
                                 : pedido.estado ||
                                   "Pendiente"}
                             </span>
@@ -676,7 +654,7 @@ function Calendar({ pedidos = [], onBack, onEditOrder }) {
                                 }
                               }}
                             >
-                              ✏️ Editar pedido
+                              <Icon name="edit" /> Editar pedido
                             </button>
 
                           </div>

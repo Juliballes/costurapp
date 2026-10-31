@@ -1,0 +1,1460 @@
+/* Identidad visual Mhome. Se carga después de los estilos de cada pantalla. */
+:root {
+    --accent: #456454;
+    --accent-dark: #2e4c3d;
+    --accent-bg: #eaf0e9;
+    --accent-border: #bdcdbd;
+    --background: #f8f7f3;
+    --card: #fffefa;
+    --text: #303b32;
+    --text-light: #69735f;
+    --border: #e3e5dc;
+    --green: #3f7254;
+    --green-bg: #eaf2e9;
+    --yellow: #946826;
+    --yellow-bg: #fbf2df;
+    --red: #a85547;
+    --red-bg: #f9ede7;
+    --shadow: 0 5px 24px rgb(43 54 40 / 4%);
+    color: var(--text);
+    background: var(--background);
+    font-family:
+        "Segoe UI",
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+}
+
+body {
+    background: var(--background);
+    color: var(--text);
+}
+.ui-icon {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+.atelier-layout {
+    background: var(--background);
+    color: var(--text);
+}
+.atelier-layout button {
+    transition:
+        background 0.18s,
+        border-color 0.18s,
+        box-shadow 0.18s,
+        transform 0.18s;
+}
+.atelier-layout button:focus-visible,
+.atelier-layout a:focus-visible {
+    outline: 3px solid #8ba98d;
+    outline-offset: 3px;
+}
+.atelier-layout button:disabled {
+    opacity: 0.45;
+}
+.atelier-layout > .sidebar {
+    width: 238px;
+    min-width: 238px;
+    height: 100dvh;
+    top: 0;
+    background: #f0f1e9;
+    border-right: 1px solid #e0e3d7;
+    padding: 36px 20px 20px;
+}
+.atelier-layout .logo {
+    padding: 0 8px 42px;
+    gap: 12px;
+}
+.atelier-layout .logo-icon {
+    width: 43px;
+    height: 49px;
+    border-radius: 15px 15px 20px 20px;
+    background: #dfe7d9;
+    color: #456454;
+    border: 1px solid #d0dacb;
+}
+.atelier-layout .logo-icon .ui-icon {
+    width: 25px;
+    height: 25px;
+}
+.atelier-layout .logo-text h2 {
+    color: #344938;
+    font:
+        500 29px/1.15 Georgia,
+        "Times New Roman",
+        serif;
+    letter-spacing: -1.1px;
+    overflow-wrap: anywhere;
+}
+.atelier-layout .logo-text > span {
+    color: #7b8274;
+    font-size: 10px;
+    letter-spacing: 0.6px;
+    margin-top: 3px;
+}
+.nav-caption {
+    font-size: 9px;
+    font-weight: 700;
+    color: #929888;
+    letter-spacing: 2px;
+    margin: 0 14px 15px;
+}
+.atelier-layout .sidebar-nav {
+    gap: 7px;
+}
+.atelier-layout .menu-button {
+    min-height: 47px;
+    padding: 12px 15px;
+    border-radius: 11px;
+    color: #697363;
+    font-size: 13px;
+    font-weight: 500;
+    gap: 13px;
+}
+.atelier-layout .menu-button:hover {
+    background: #e5e9de;
+    color: #344938;
+    transform: none;
+}
+.atelier-layout .menu-button.active {
+    background: #3c5947;
+    color: #fffefa;
+    box-shadow: 0 4px 12px rgb(38 64 43 / 9%);
+}
+.atelier-layout .menu-icon {
+    width: 21px;
+}
+.atelier-layout .menu-icon .ui-icon {
+    width: 20px;
+    height: 20px;
+}
+.atelier-layout .sidebar-bottom {
+    gap: 23px;
+}
+.atelier-signature {
+    border-top: 1px dashed #cbd3c1;
+    padding: 24px 10px 0;
+    color: #7b8970;
+}
+.atelier-signature > .ui-icon {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 10px;
+}
+.atelier-signature p {
+    font:
+        italic 15px/1.6 Georgia,
+        serif;
+}
+.atelier-signature p span {
+    color: #929988;
+}
+.atelier-layout .sidebar-footer {
+    padding: 16px 8px 0;
+    border-top: 1px solid #dce1d2;
+    gap: 11px;
+}
+.profile-initial {
+    display: grid;
+    place-items: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    color: #6b5141;
+    background: #e8dbca;
+    font:
+        18px Georgia,
+        serif;
+}
+.atelier-layout .sidebar-footer strong {
+    color: #46513e;
+    font-size: 12px;
+}
+.atelier-layout .sidebar-footer span:not(.profile-initial) {
+    color: #87917c;
+    font-size: 10px;
+}
+.atelier-layout .main-content {
+    padding: 26px 44px 42px !important;
+}
+.workspace-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 32px;
+    padding-bottom: 21px;
+    border-bottom: 1px solid var(--border);
+    color: #6b765f;
+    font-size: 10px;
+    letter-spacing: 1.3px;
+}
+.workspace-topline i {
+    font-style: normal;
+    margin: 0 12px;
+    color: #b0b6a5;
+}
+.workspace-topline strong {
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: #616f58;
+}
+.workspace-user {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 10px;
+    letter-spacing: 0.2px;
+}
+.workspace-user .ui-icon {
+    width: 17px;
+    height: 17px;
+    margin-left: 11px;
+}
+.workspace-status-dot {
+    width: 5px;
+    height: 5px;
+    background: #8ea17d;
+    border-radius: 50%;
+}
+.atelier-layout
+    :is(
+        .dashboard-page,
+        .orders-page,
+        .calendar-page,
+        .new-order-page,
+        .order-detail-page,
+        .earnings-page
+    ) {
+    background: transparent;
+}
+.atelier-layout :is(.page-header, .orders-header, .calendar-header) {
+    margin-bottom: 28px;
+}
+.atelier-layout :is(.page-header, .orders-header, .calendar-header) h1,
+.atelier-layout .detail-hero h1 {
+    font:
+        500 clamp(29px, 3vw, 37px)/1.18 Georgia,
+        "Times New Roman",
+        serif;
+    letter-spacing: -1px;
+    color: #354537;
+}
+.atelier-layout :is(.page-header, .orders-header, .calendar-header) p {
+    color: #69745f;
+    font-size: 13px;
+    margin-top: 9px;
+}
+
+/* Inicio */
+.atelier-layout .dashboard-welcome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+    padding: 34px 35px;
+    min-height: 210px;
+    margin-bottom: 25px;
+    border: 1px solid #dce3d4;
+    border-radius: 21px;
+    background: #edf0e5;
+    box-shadow: none;
+}
+.dashboard-welcome .welcome-copy {
+    position: relative;
+    z-index: 1;
+}
+.atelier-layout .dashboard-eyebrow {
+    font-size: 9px;
+    letter-spacing: 2.3px;
+    color: #718167;
+    font-weight: 600;
+}
+.atelier-layout .dashboard-welcome h1 {
+    margin: 13px 0 12px;
+    font:
+        500 clamp(32px, 3.4vw, 45px)/1.1 Georgia,
+        serif;
+    letter-spacing: -1.5px;
+    color: #385139;
+}
+.atelier-layout .dashboard-welcome p {
+    color: #65765a;
+    font-size: 12px;
+    line-height: 1.7;
+    max-width: 340px;
+}
+.welcome-actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: flex-end;
+}
+.atelier-layout .dashboard-date {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    border: none;
+    min-width: 0;
+}
+.atelier-layout .dashboard-date > .ui-icon {
+    color: #849575;
+    width: 23px;
+    height: 23px;
+}
+.atelier-layout .dashboard-date span {
+    font-size: 9px;
+    color: #647853;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    display: block;
+    margin: 0 0 4px;
+}
+.atelier-layout .dashboard-date strong {
+    font-size: 12px;
+    color: #5a6c4c;
+    font-weight: 500;
+    display: block;
+}
+.hero-stitch {
+    position: absolute;
+    right: 210px;
+    bottom: -48px;
+    width: 190px;
+    height: 190px;
+    border: 1px dashed #ced8c3;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    transform: rotate(-15deg);
+    opacity: 0.6;
+    pointer-events: none;
+}
+.hero-stitch .ui-icon {
+    width: 80px;
+    height: 80px;
+    color: #d2dbc7;
+    stroke-width: 0.7;
+}
+.atelier-layout
+    :is(
+        .dashboard-new-order-button,
+        .new-order-button,
+        .save-button,
+        .detail-edit-button
+    ) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border-radius: 10px;
+    min-height: 43px;
+    background: #456454;
+    color: #fffefa;
+    border: 1px solid #456454;
+    padding: 11px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 3px 9px rgb(44 67 48 / 8%);
+}
+.atelier-layout
+    :is(
+        .dashboard-new-order-button,
+        .new-order-button,
+        .save-button,
+        .detail-edit-button
+    ):hover:not(:disabled) {
+    background: #2f4e3b;
+    box-shadow: 0 4px 12px rgb(44 67 48 / 12%);
+    transform: translateY(-1px);
+}
+.atelier-layout
+    :is(
+        .dashboard-new-order-button,
+        .new-order-button,
+        .save-button,
+        .detail-edit-button
+    )
+    .ui-icon {
+    width: 17px;
+    height: 17px;
+}
+.atelier-layout .dashboard-stats {
+    gap: 15px;
+    margin-bottom: 25px;
+}
+.atelier-layout .dashboard-stat-card {
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: #fffefa;
+    box-shadow: none;
+    padding: 21px 18px;
+    gap: 14px;
+}
+.atelier-layout .dashboard-stat-card:hover {
+    border-color: #bacab4;
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+.atelier-layout .dashboard-stat-card span {
+    color: #66735c;
+    font-size: 12px;
+    font-weight: 500;
+}
+.atelier-layout .dashboard-stat-card strong {
+    color: #344735;
+    font:
+        500 31px/1.25 Georgia,
+        serif;
+    margin: 5px 0 3px;
+}
+.atelier-layout .dashboard-stat-card small {
+    font-size: 11px;
+    color: #6e7964;
+}
+.atelier-layout .dashboard-stat-icon {
+    width: 39px;
+    height: 39px;
+    min-width: 39px;
+    background: #f0f3e9;
+    border: none;
+    border-radius: 12px;
+    color: #879b72;
+}
+.atelier-layout .dashboard-stat-card.urgent .dashboard-stat-icon {
+    background: #f9eee8;
+    color: #b78368;
+}
+.atelier-layout .dashboard-stat-card.today .dashboard-stat-icon {
+    background: #f7f0df;
+    color: #b5995e;
+}
+.atelier-layout .dashboard-stat-card.ready .dashboard-stat-icon {
+    background: #eaf1eb;
+    color: #7f9a7b;
+}
+.atelier-layout :is(.dashboard-panel, .reminder-card) {
+    background: #fffefa;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    box-shadow: none;
+    padding: 24px;
+}
+.atelier-layout .dashboard-panel {
+    margin-bottom: 24px;
+}
+.atelier-layout .dashboard-panel-header {
+    margin-bottom: 20px;
+}
+.atelier-layout .dashboard-section-title {
+    gap: 12px;
+}
+.atelier-layout .dashboard-section-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #f2f4ec;
+    color: #849575;
+}
+.atelier-layout .dashboard-section-icon.late {
+    color: #af7d63;
+    background: #f8eee7;
+}
+.atelier-layout :is(.dashboard-panel h2, .reminder-card h2) {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: #42513e;
+}
+.atelier-layout .dashboard-panel-header p {
+    font-size: 11px;
+    color: #6c7861;
+}
+.atelier-layout .dashboard-link-button {
+    color: #6a805b;
+    font-size: 11px;
+    background: transparent;
+    padding: 8px 0 8px 12px;
+}
+.atelier-layout :is(.dashboard-order-row, .today-order-card, .upcoming-row) {
+    background: #fafbf6;
+    border: 1px solid #ebeee4;
+    border-radius: 12px;
+    box-shadow: none;
+}
+.atelier-layout :is(.dashboard-order-row.late) {
+    background: #fcf8f3;
+    border-color: #efe5d9;
+}
+.atelier-layout :is(.dashboard-order-icon, .today-order-icon, .upcoming-icon) {
+    width: 37px;
+    height: 37px;
+    min-width: 37px;
+    border-radius: 10px;
+    background: #edf0e6;
+    color: #8b9c79;
+}
+.atelier-layout
+    :is(
+        .dashboard-order-main strong,
+        .today-order-main strong,
+        .upcoming-main strong
+    ) {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4d5a45;
+}
+.atelier-layout
+    :is(
+        .dashboard-order-main span,
+        .today-order-main span,
+        .upcoming-main span
+    ) {
+    font-size: 10px;
+    color: #6d7a62;
+}
+.atelier-layout :is(.dashboard-order-date, .upcoming-date) {
+    font-size: 11px;
+    color: #6c795e;
+}
+.atelier-layout .dashboard-overdue-badge {
+    font-size: 9px;
+    background: #f5e8df;
+    color: #aa7c5e;
+    border: 1px solid #eddacc;
+    gap: 5px;
+}
+.atelier-layout .dashboard-overdue-badge .ui-icon {
+    width: 13px;
+    height: 13px;
+}
+.atelier-layout .dashboard-empty-state {
+    background: #f8faf4;
+    border: 1px dashed #dbe4d0;
+    border-radius: 12px;
+    color: #859973;
+}
+.atelier-layout .dashboard-empty-state strong {
+    color: #6d815b;
+    font-size: 12px;
+}
+.atelier-layout .dashboard-empty-state p {
+    font-size: 11px;
+    color: #6e7e5f;
+}
+.atelier-layout .reminder-card {
+    background: #f1f0e5;
+    border-color: #e4e1ce;
+}
+.atelier-layout .reminder-bell {
+    background: #e6e5d2;
+    color: #a8a16e;
+    animation: none;
+    box-shadow: none;
+}
+.atelier-layout .reminder-label {
+    color: #9a9872;
+    letter-spacing: 1.6px;
+    font-size: 9px;
+}
+.atelier-layout .reminder-items :is(.ui-icon) {
+    width: 14px;
+    height: 14px;
+}
+
+/* Tarjetas, formularios y detalles */
+.atelier-layout
+    :is(
+        .form-section,
+        .detail-panel,
+        .detail-info-card,
+        .detail-hero,
+        .order-card-new,
+        .calendar-card,
+        .calendar-sidebar
+    ) {
+    background: #fffefa;
+    border-color: var(--border);
+    box-shadow: none;
+    border-radius: 17px;
+}
+.atelier-layout .form-section {
+    padding: 27px;
+}
+.atelier-layout .form-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #46573f;
+}
+.atelier-layout .form-section h2 .ui-icon {
+    width: 19px;
+    height: 19px;
+    color: #8a9b77;
+}
+.atelier-layout .form-group label {
+    color: #63715a;
+    font-size: 12px;
+    font-weight: 600;
+}
+.atelier-layout .form-group :is(input, select, textarea),
+.atelier-layout .payment-summary-item input,
+.atelier-layout .earnings-date-selector input {
+    background-color: #fbfcf7;
+    border-color: #dfe5d7;
+    border-radius: 9px;
+    color: #46533e;
+    font-size: 13px;
+}
+.atelier-layout .form-group :is(input, select, textarea):focus {
+    border-color: #9bb28b;
+    box-shadow: 0 0 0 3px #eaf1e4;
+    background-color: white;
+}
+.atelier-layout .form-group select {
+    background-image:
+        linear-gradient(45deg, transparent 50%, #819373 50%),
+        linear-gradient(135deg, #819373 50%, transparent 50%);
+}
+.atelier-layout :is(input, textarea)::placeholder {
+    color: #a0a791;
+}
+.atelier-layout .garment-card {
+    border: 1px solid #e5eadd;
+    background: #f9fbf5;
+    box-shadow: none;
+    border-radius: 13px;
+    padding: 21px;
+}
+.atelier-layout .garment-header strong {
+    color: #6d825c;
+    font-size: 12px;
+    letter-spacing: 0.2px;
+}
+.atelier-layout .quantity-control {
+    border-color: #dce5d3;
+    border-radius: 9px;
+}
+.atelier-layout .quantity-control button {
+    color: #71865e;
+    background: #f0f4e9;
+}
+.atelier-layout .line-subtotal {
+    background: #edf3e5;
+    color: #71845d;
+    padding: 11px 13px;
+}
+.atelier-layout .line-subtotal strong {
+    color: #526b3f;
+    font-size: 18px;
+}
+.atelier-layout :is(.section-help, .payment-status-help) {
+    color: #69765e;
+    font-size: 11px;
+}
+.atelier-layout .payment-summary-item {
+    background: #f9faf5;
+    border-color: #e3e8da;
+    border-radius: 11px;
+}
+.atelier-layout .payment-summary-item:first-child {
+    border-color: #d5e0ca;
+    background: #edf3e5;
+}
+.atelier-layout .payment-summary-item:first-child strong {
+    color: #527044;
+}
+.atelier-layout .payment-summary-item :is(span, label) {
+    color: #6c7b5b;
+    font-size: 11px;
+}
+.atelier-layout .payment-summary-item strong {
+    font-size: 21px;
+}
+.atelier-layout .payment-status-container {
+    background: #fafbf6;
+    border-color: #e4e9dc;
+}
+.atelier-layout .payment-status-label {
+    font-size: 11px;
+    color: #7c896c;
+}
+.atelier-layout .payment-status-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 9px;
+    font-size: 12px;
+}
+.atelier-layout .payment-status-button .ui-icon {
+    width: 16px;
+    height: 16px;
+}
+.atelier-layout .payment-status-button.paid.active {
+    background: #e5eedc;
+    border-color: #cadcb8;
+    color: #5a7847;
+}
+.atelier-layout .payment-status-button.pending.active {
+    background: #f8f1e3;
+    border-color: #e9ddc2;
+    color: #a18a50;
+}
+.atelier-layout .form-actions {
+    border-color: #dfe5d7;
+    border-radius: 13px;
+    background: rgb(255 254 250 / 97%);
+    box-shadow: 0 4px 22px rgb(56 76 42 / 6%);
+    backdrop-filter: blur(10px);
+}
+.atelier-layout .form-total span {
+    color: #6d7c5e;
+    font-size: 10px;
+}
+.atelier-layout .form-total strong {
+    color: #526d40;
+    font-size: 24px;
+}
+.atelier-layout
+    :is(
+        .back-button,
+        .cancel-button,
+        .detail-back-button,
+        .today-button,
+        .calendar-back-button
+    ) {
+    border: 1px solid #e2e7d9;
+    border-radius: 9px;
+    background: #fffefa;
+    color: #7a8869;
+    box-shadow: none;
+    font-size: 12px;
+}
+.atelier-layout :is(.back-button, .cancel-button, .detail-back-button):hover {
+    background: #f0f4e8;
+    color: #4f6740;
+}
+.atelier-layout
+    :is(
+        .detail-edit-button,
+        .view-order-button,
+        .edit-order-button,
+        .delete-order-button,
+        .whatsapp-order-button,
+        .whatsapp-button
+    )
+    .ui-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+}
+.atelier-layout :is(.detail-panel h2, .detail-panel-header h2) {
+    color: #506245;
+    font-size: 15px;
+    font-weight: 600;
+}
+.atelier-layout .detail-hero {
+    background: #f1f4e9;
+    border-color: #e0e7d5;
+}
+.atelier-layout
+    :is(
+        .detail-hero-icon,
+        .detail-info-icon,
+        .detail-garment-icon,
+        .detail-old-order-icon
+    ) {
+    background: #e7eedf;
+    color: #819b69;
+    border-radius: 13px;
+}
+.atelier-layout .detail-garment-card {
+    background: #fafcf6;
+    border-color: #e5ecdb;
+}
+.atelier-layout .detail-garment-price {
+    color: #586f45;
+}
+.atelier-layout .detail-garment-price small {
+    color: #71805f;
+    font-size: 11px;
+}
+.atelier-layout .detail-garment-description {
+    background: #fffefa;
+    border-color: #e9eddf;
+}
+.atelier-layout .detail-status-box {
+    background: #f8faf3;
+    border-color: #e3e9d8;
+}
+.atelier-layout :is(.detail-notes-box, .detail-empty-notes) {
+    background: #f8faf3;
+    color: #8a967a;
+}
+.atelier-layout .settings-preview {
+    background: #edf4e6;
+    border-color: #d9e6cc;
+}
+.atelier-layout .settings-preview h3 {
+    color: #788f63;
+}
+.atelier-layout .settings-preview p {
+    color: #536a43;
+    font-size: 13px;
+}
+
+/* Pedidos y calendario */
+.atelier-layout .date-filters {
+    padding: 5px;
+    gap: 3px;
+    background: #edf0e7;
+    border: 1px solid #e1e6d7;
+    border-radius: 11px;
+    box-shadow: none;
+}
+.atelier-layout .date-filter-button {
+    background: transparent;
+    color: #677b55;
+    font-size: 11px;
+    border-radius: 7px;
+}
+.atelier-layout .date-filter-button.active {
+    background: #fffefa;
+    color: #596f46;
+    box-shadow: 0 1px 5px #dce3d3;
+}
+.atelier-layout .date-filter-button .ui-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+}
+.atelier-layout :is(.search-box, .status-filter select) {
+    border-color: #dfe6d5;
+    border-radius: 10px;
+    background-color: #fffefa;
+    box-shadow: none;
+}
+.atelier-layout .search-box {
+    min-height: 47px;
+}
+.atelier-layout .search-box input {
+    font-size: 12px;
+}
+.atelier-layout .search-box .ui-icon {
+    color: #a1af8f;
+    width: 18px;
+    height: 18px;
+}
+.atelier-layout .order-card-new {
+    border: 1px solid #e3e8d9;
+    border-radius: 14px;
+    box-shadow: none;
+}
+.atelier-layout .order-card-new:hover {
+    border-color: #bccdb0;
+    box-shadow: var(--shadow);
+}
+.atelier-layout :is(.order-card-icon, .order-garment-icon) {
+    background: #edf2e5;
+    color: #8fa179;
+    border-radius: 11px;
+}
+.atelier-layout .order-card-icon .ui-icon {
+    width: 26px;
+    height: 26px;
+}
+.atelier-layout .order-garments-preview {
+    background: #f8faf3;
+    border-color: #eaf0e0;
+}
+.atelier-layout .order-garment-icon .ui-icon {
+    width: 17px;
+    height: 17px;
+}
+.atelier-layout .order-title-row h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #536643;
+}
+.atelier-layout .order-line-subtotal {
+    color: #829669;
+}
+.atelier-layout
+    :is(
+        .order-client,
+        .order-garment-row span,
+        .order-payment span,
+        .order-delivery span
+    ) {
+    color: #69785b;
+}
+.atelier-layout .order-payment strong {
+    font-size: 16px;
+    color: #5b7347;
+}
+.atelier-layout .order-payment {
+    border-color: #e5ecd9;
+}
+.atelier-layout :is(.order-status-badge, .priority-badge) {
+    gap: 5px;
+    border-radius: 7px;
+    box-shadow: none;
+    font-size: 10px;
+}
+.atelier-layout .order-status-badge::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.atelier-layout .order-actions button {
+    border-radius: 8px;
+    min-height: 35px;
+    padding: 8px 12px;
+    font-size: 11px;
+    box-shadow: none;
+}
+.atelier-layout :is(.view-order-button, .edit-order-button) {
+    background: #f0f4e8;
+    color: #71895c;
+    border: 1px solid #dbe6ce;
+}
+.atelier-layout .delete-order-button {
+    background: #fcf5ee;
+    color: #b49073;
+    border-color: #f1e5d7;
+}
+.atelier-layout .calendar-title-icon {
+    display: none;
+}
+.atelier-layout .calendar-card {
+    overflow: hidden;
+}
+.atelier-layout .month-navigation h2 {
+    font:
+        500 23px Georgia,
+        serif;
+    color: #5b7049;
+}
+.atelier-layout :is(.month-arrow, .today-button) {
+    color: #88a071;
+    border-color: #dfebd3;
+    background: #fffefa;
+}
+.atelier-layout .week-header {
+    background: #f0f5e7;
+    border-color: #e3ebd6;
+}
+.atelier-layout .week-day {
+    color: #92a37c;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+.atelier-layout .calendar-day {
+    border-color: #e9eedf;
+    background: #fffefa;
+}
+.atelier-layout .calendar-day:hover {
+    background: #f4f8ed;
+}
+.atelier-layout .calendar-day.today {
+    background: #f3f7e9;
+}
+.atelier-layout .calendar-day.today .day-number {
+    background: #829a68;
+    color: white;
+    border-color: #829a68;
+}
+.atelier-layout .calendar-day.selected {
+    border-color: #93ae78;
+    box-shadow: inset 0 0 0 1px #93ae78;
+}
+.atelier-layout .mini-order-name .ui-icon {
+    width: 12px;
+    height: 12px;
+    margin-right: 3px;
+}
+.atelier-layout .mini-order {
+    background: #edf4e3;
+    color: #7e9863;
+    border-color: #dfeacf;
+}
+.atelier-layout .mini-order.urgent {
+    background: #fbefe3;
+    color: #b49664;
+}
+.atelier-layout .calendar-sidebar {
+    background: #fffefa;
+}
+.atelier-layout .sidebar-header {
+    background: #f3f7eb;
+    border-color: #e4edd8;
+}
+.atelier-layout .weekly-collection-card {
+    background: #edf3e5;
+    border: 1px solid #dce8ce;
+    border-radius: 18px;
+    box-shadow: none;
+}
+.atelier-layout .weekly-collection-icon {
+    color: #91ab75;
+    background: #e1edcf;
+}
+.atelier-layout .weekly-collection-info strong {
+    color: #567240;
+    font:
+        500 43px Georgia,
+        serif;
+}
+.atelier-layout .weekly-collection-info :is(span, small) {
+    color: #647c4f;
+}
+.atelier-layout .status-modal {
+    border-radius: 20px;
+    background: #fffefa;
+    box-shadow: 0 20px 70px #263b2930;
+}
+.atelier-layout .whatsapp-preview {
+    background: #edf5e7;
+    border-color: #d9e8ce;
+}
+.atelier-layout .whatsapp-button {
+    background: #527c4c;
+    box-shadow: none;
+    border-radius: 11px;
+}
+
+@media (max-width: 1200px) {
+    .atelier-layout .main-content {
+        padding-left: 28px !important;
+        padding-right: 28px !important;
+    }
+    .atelier-layout .dashboard-stat-card {
+        padding: 18px 13px;
+        gap: 10px;
+    }
+    .atelier-layout .dashboard-stat-card strong {
+        font-size: 27px;
+    }
+    .atelier-layout .dashboard-welcome {
+        padding: 28px;
+    }
+}
+@media (min-width: 701px) and (max-width: 960px) {
+    .atelier-layout > .sidebar {
+        width: 190px;
+        min-width: 190px;
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+    .atelier-layout .logo-text h2 {
+        display: block;
+        font-size: 25px;
+    }
+    .atelier-layout .logo {
+        gap: 9px;
+    }
+    .atelier-layout .menu-button {
+        gap: 9px;
+    }
+    .atelier-layout .dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .atelier-layout .dashboard-welcome {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .welcome-actions {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+    .hero-stitch {
+        right: 0;
+    }
+}
+@media (max-width: 700px) {
+    .atelier-layout > .sidebar {
+        position: static;
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        padding: 19px 20px;
+        background: var(--background);
+        border: 0;
+    }
+    .atelier-layout .logo {
+        padding: 0;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+    .atelier-layout .logo-icon {
+        width: 35px;
+        height: 39px;
+        border-radius: 12px;
+    }
+    .atelier-layout .logo-icon .ui-icon {
+        width: 21px;
+        height: 21px;
+    }
+    .atelier-layout .logo-text h2 {
+        display: block;
+        font-size: 25px;
+    }
+    .atelier-layout .logo-text > span {
+        display: block;
+        font-size: 9px;
+    }
+    .atelier-layout .nav-caption,
+    .atelier-layout .sidebar-bottom {
+        display: none;
+    }
+    .atelier-layout .sidebar-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-around;
+        gap: 2px;
+        padding: 8px 10px calc(9px + env(safe-area-inset-bottom));
+        background: rgb(255 254 250 / 98%);
+        border-top: 1px solid #dfe6d5;
+        box-shadow: 0 -4px 20px #52683d08;
+        backdrop-filter: blur(12px);
+    }
+    .atelier-layout .sidebar-nav .menu-button {
+        flex: 1;
+        min-width: 0;
+        min-height: 48px;
+        flex-direction: column;
+        gap: 5px;
+        padding: 7px 2px;
+        border-radius: 9px;
+        background: transparent;
+        color: #6b7c5a;
+        box-shadow: none;
+    }
+    .atelier-layout .sidebar-nav .menu-button.active {
+        background: #edf3e5;
+        color: #597a41;
+    }
+    .atelier-layout .sidebar-nav .menu-button span:last-child {
+        display: block;
+        font-size: 9px;
+        max-width: 100%;
+        overflow-wrap: normal;
+        font-weight: 500;
+    }
+    .atelier-layout .sidebar-nav .menu-button .config-nav-full {
+        display: none;
+    }
+    .atelier-layout .sidebar-nav .menu-button .config-nav-short {
+        display: block;
+    }
+    .atelier-layout .sidebar-nav .menu-icon .ui-icon {
+        width: 20px;
+        height: 20px;
+    }
+    .atelier-layout .main-content {
+        padding: 8px 18px 105px !important;
+    }
+    .workspace-topline {
+        display: none;
+    }
+    .atelier-layout :is(.page-header, .orders-header, .calendar-header) {
+        margin-bottom: 23px;
+    }
+    .atelier-layout :is(.page-header, .orders-header, .calendar-header) h1 {
+        font-size: 31px;
+    }
+    .atelier-layout :is(.page-header, .orders-header, .calendar-header) p {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+    .atelier-layout .dashboard-welcome {
+        padding: 26px 23px;
+        border-radius: 17px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 24px;
+        min-height: 0;
+    }
+    .atelier-layout .dashboard-welcome h1 {
+        font-size: 37px;
+        margin-top: 12px;
+    }
+    .atelier-layout .dashboard-welcome p {
+        font-size: 12px;
+        max-width: 280px;
+    }
+    .welcome-actions {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        gap: 13px;
+        justify-content: space-between;
+    }
+    .atelier-layout .dashboard-date {
+        gap: 7px;
+    }
+    .atelier-layout .dashboard-date strong {
+        font-size: 9px;
+    }
+    .atelier-layout .dashboard-date span {
+        font-size: 7px;
+    }
+    .atelier-layout .dashboard-date > .ui-icon {
+        display: none;
+    }
+    .atelier-layout .dashboard-new-order-button {
+        padding: 10px 11px;
+        font-size: 11px;
+        min-height: 39px;
+        white-space: nowrap;
+    }
+    .hero-stitch {
+        right: -25px;
+        bottom: -38px;
+        opacity: 0.5;
+    }
+    .atelier-layout .dashboard-stats {
+        gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-bottom: 18px;
+    }
+    .atelier-layout .dashboard-stat-card {
+        padding: 16px 13px;
+        border-radius: 12px;
+        gap: 11px;
+    }
+    .atelier-layout .dashboard-stat-icon {
+        width: 30px;
+        min-width: 30px;
+        height: 30px;
+        border-radius: 9px;
+    }
+    .atelier-layout .dashboard-stat-icon .ui-icon {
+        width: 18px;
+        height: 18px;
+    }
+    .atelier-layout .dashboard-stat-card strong {
+        font-size: 27px;
+    }
+    .atelier-layout .dashboard-stat-card span {
+        font-size: 11px;
+    }
+    .atelier-layout .dashboard-stat-card small {
+        font-size: 10px;
+    }
+    .atelier-layout :is(.dashboard-panel, .reminder-card) {
+        padding: 19px;
+        border-radius: 13px;
+    }
+    .atelier-layout .dashboard-panel {
+        margin-bottom: 18px;
+    }
+    .atelier-layout .form-section {
+        padding: 21px 18px;
+        border-radius: 13px;
+    }
+    .atelier-layout .garment-card {
+        padding: 17px 14px;
+    }
+    .atelier-layout .new-order-page .form-actions {
+        bottom: calc(78px + env(safe-area-inset-bottom));
+        padding: 12px 14px;
+        gap: 8px;
+    }
+    .atelier-layout .form-total strong {
+        font-size: 21px;
+    }
+    .atelier-layout .form-actions button {
+        min-height: 40px;
+        font-size: 11px;
+    }
+    .atelier-layout .date-filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+    }
+    .atelier-layout .date-filter-button {
+        flex-shrink: 0;
+        padding: 9px 10px;
+    }
+    .atelier-layout .order-card-new {
+        padding: 18px;
+    }
+    .atelier-layout .order-card-new .order-payment {
+        padding: 14px 0;
+    }
+    .atelier-layout .order-actions button {
+        min-height: 40px;
+    }
+    .atelier-layout .calendar-content {
+        padding-bottom: 0;
+    }
+    .atelier-layout .weekly-collection-info strong {
+        font-size: 34px;
+    }
+    .atelier-layout .status-modal-backdrop {
+        padding-bottom: 85px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .atelier-layout *,
+    .atelier-layout *::before,
+    .atelier-layout *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Ajustes de lectura y controles compactos. */
+.atelier-layout .sidebar-footer .profile-initial {
+    font-size: 17px;
+    color: #6c5945;
+}
+.atelier-layout .order-actions .view-order-button {
+    background: #edf2e5 !important;
+    color: #5e754a !important;
+    border: 1px solid #d7e2ca !important;
+}
+.atelier-layout .order-actions .view-order-button:hover {
+    background: #e0ead5 !important;
+    color: #476036 !important;
+}
+.atelier-layout .order-actions .whatsapp-order-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #426b42;
+    background: #eff6e9;
+    border-color: #d0e3c2;
+}
+.atelier-layout .order-actions .whatsapp-order-button .ui-icon {
+    margin: 0;
+}
+.atelier-layout .order-garment-row {
+    background: #f7f9f1;
+    border: 1px solid #e6ecd9;
+    border-radius: 10px;
+}
+.atelier-layout .status-filter {
+    box-shadow: none;
+    background: #fffefa;
+    border-color: #e2e8d9;
+    border-radius: 10px;
+}
+.atelier-layout .status-filter select {
+    background-image:
+        linear-gradient(45deg, transparent 50%, #819373 50%),
+        linear-gradient(135deg, #819373 50%, transparent 50%);
+}
+.atelier-layout .earnings-date-selector {
+    max-width: 320px;
+}
+.atelier-layout .earnings-date-selector label {
+    display: block;
+    margin-bottom: 9px;
+    font-size: 12px;
+    color: #6d7b5f;
+}
+.atelier-layout .earnings-date-selector input {
+    width: 100%;
+    min-height: 45px;
+    padding: 10px 13px;
+    border: 1px solid #dfe5d7;
+}
+.atelier-layout .empty-state-card {
+    min-height: 200px;
+    border-color: #e5ebdc;
+    border-radius: 13px;
+    background: #fcfdf8;
+    box-shadow: none;
+}
+.atelier-layout .calendar-day.today .day-number {
+    background: transparent;
+}
+.atelier-layout .calendar-day.today .day-number > span {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    background: #5c7745;
+    color: white;
+    border-radius: 50%;
+}
+.atelier-layout .day-number small {
+    color: #5d7848;
+    background: #e2edda;
+}
+.atelier-layout .week-day {
+    color: #5d7148;
+}
+.atelier-layout .empty-day-text {
+    color: #6f7b63;
+}
+.atelier-layout .reminder-items button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #6e7452;
+    font-size: 12px;
+}
+.atelier-layout .detail-summary-icon {
+    color: #8b9e76;
+    background: #edf2e5;
+}
+.atelier-layout .detail-status-box strong {
+    background: transparent;
+}
+.atelier-layout .form-group label {
+    font-size: 13px;
+}
+.atelier-layout :is(.section-help, .payment-status-help) {
+    font-size: 12px;
+}
+.atelier-layout .form-total span {
+    font-size: 11px;
+}
+@media (max-width: 700px) {
+    .atelier-layout .calendar-day.today .day-number > span {
+        width: 23px;
+        height: 23px;
+    }
+    .atelier-layout .new-order-page .form-actions {
+        bottom: calc(76px + env(safe-area-inset-bottom));
+    }
+}
+
+.atelier-layout .saldo-pendiente, .atelier-layout .detail-pending-text { color: #8f632e; }
+.atelier-layout .saldo-pagado, .atelier-layout .detail-paid-text { color: #45704d; }
+
+.atelier-layout .logo-text { min-width: 0; }
+.atelier-layout .order-form [aria-invalid="true"] { border-color: #ad4f42; background: #fff4ee; }
+.atelier-layout .new-order-page :is(button,input,select,textarea):focus-visible { outline: 3px solid #8ba98d; outline-offset: 3px; }
+.atelier-layout .ready-modal { max-height: calc(100dvh - 85px); overflow-y: auto; }
+
+.atelier-layout .dashboard-section-icon.ready { color: #6d8756; background: #edf2e5; }
+.atelier-layout .legend-dot.pending { background: #93a879; }
+.atelier-layout .legend-dot.urgent { background: #a85a45; }
+.atelier-layout .legend-dot.neutral { background: #c6ccbe; }

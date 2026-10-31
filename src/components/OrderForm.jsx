@@ -1,3 +1,4 @@
+import Icon from "./Icon";
 import { useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import {
@@ -115,7 +116,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
         <div className="new-order-page">
             <header className="page-header">
                 <div>
-                    <h1>{pedido ? "Editar pedido ✏️" : "Nuevo pedido 🧵"}</h1>
+                    <h1>{pedido ? "Editar pedido" : "Nuevo pedido"}</h1>
                     <p>
                         Todos los trabajos, importes y datos del cliente en un
                         solo lugar.
@@ -143,7 +144,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                 )}
                 <fieldset className="order-fields" disabled={guardando}>
                     <section className="form-section">
-                        <h2>👤 Datos del cliente</h2>
+                        <h2><Icon name="user" /> Datos del cliente</h2>
                         <div className="form-grid">
                             <div className="form-group">
                                 <label htmlFor="cliente-nombre">
@@ -188,7 +189,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                     <section className="form-section">
                         <div className="form-section-heading">
                             <div>
-                                <h2>🧵 Trabajos del pedido</h2>
+                                <h2><Icon name="thread" /> Trabajos del pedido</h2>
                                 <p className="section-help">
                                     Ingresá el precio de una unidad. La cantidad
                                     se multiplica automáticamente.
@@ -204,7 +205,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                                     ])
                                 }
                             >
-                                ＋ Agregar prenda
+                                <Icon name="plus" /> Agregar prenda
                             </button>
                         </div>
                         {ayudaError("prendas")}
@@ -239,7 +240,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                                                     setErrores({});
                                                 }}
                                             >
-                                                🗑️
+                                                <Icon name="trash" />
                                             </button>
                                         </div>
                                         <div className="form-grid">
@@ -431,7 +432,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                         </div>
                     </section>
                     <section className="form-section">
-                        <h2>📅 Entrega y estado</h2>
+                        <h2><Icon name="calendar" /> Entrega y estado</h2>
                         <div className="form-grid">
                             <div className="form-group">
                                 <label htmlFor="fecha-entrega">
@@ -487,7 +488,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                         </div>
                     </section>
                     <section className="form-section">
-                        <h2>💰 Información de pago</h2>
+                        <h2><Icon name="wallet" /> Información de pago</h2>
                         <div className="payment-summary">
                             <div className="payment-summary-item">
                                 <span>Total del pedido</span>
@@ -534,7 +535,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                                     className={`payment-status-button pending ${!datos.pagado ? "active" : ""}`}
                                     onClick={() => cambiar("pagado", false)}
                                 >
-                                    ⏳ Pago pendiente
+                                    <Icon name="clock" /> Pago pendiente
                                 </button>
                                 <button
                                     type="button"
@@ -542,7 +543,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                                     className={`payment-status-button paid ${datos.pagado ? "active" : ""}`}
                                     onClick={() => cambiar("pagado", true)}
                                 >
-                                    ✅ Pagado
+                                    <Icon name="checkCircle" /> Pagado
                                 </button>
                             </div>
                             <small className="payment-status-help">
@@ -551,7 +552,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                         </div>
                     </section>
                     <section className="form-section">
-                        <h2>📝 Notas</h2>
+                        <h2><Icon name="note" /> Notas</h2>
                         <div className="form-group">
                             <label htmlFor="pedido-notas">
                                 Notas generales

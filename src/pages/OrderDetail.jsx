@@ -1,3 +1,4 @@
+import Icon, { GarmentIcon } from "../components/Icon";
 import { useState } from "react";
 import { resumenPago, subtotalPrenda } from "../lib/orderTotals";
 
@@ -30,7 +31,7 @@ function OrderDetail({
 
                 <div className="detail-empty-card">
                     <div className="detail-empty-icon">
-                        📋
+                        <Icon name="orders" />
                     </div>
 
                     <h2>
@@ -109,50 +110,31 @@ function OrderDetail({
         )}`;
     };
 
-    const obtenerIcono = (
-        tipo
-    ) => {
-        switch (tipo) {
-            case "Vestido":
-                return "👗";
-            case "Pantalón":
-                return "👖";
-            case "Blusa":
-                return "👚";
-            case "Camisa":
-                return "👔";
-            case "Saco":
-                return "🧥";
-            case "Falda":
-                return "👗";
-            default:
-                return "🧵";
-        }
-    };
+    const obtenerIcono = (tipo) => <GarmentIcon tipo={tipo} />;
 
     const obtenerTextoEstado = () => {
         if (
             pedidoActual.estado ===
             "Listo"
         ) {
-            return "🟢 Listo";
+            return "Listo";
         }
 
         if (
             pedidoActual.estado ===
             "Entregado"
         ) {
-            return "⚪ Entregado";
+            return "Entregado";
         }
 
         if (
             pedidoActual.estado ===
             "Pendiente"
         ) {
-            return "⚪ Pendiente";
+            return "Pendiente";
         }
 
-        return "🟡 En proceso";
+        return "En proceso";
     };
 
     const obtenerClaseEstado = () => {
@@ -205,7 +187,7 @@ function OrderDetail({
                         setEditando(true)
                     }
                 >
-                    ✏️ Editar pedido
+                    <Icon name="edit" /> Editar pedido
                 </button>
 
             </div>
@@ -275,7 +257,7 @@ function OrderDetail({
                 <div className="detail-summary-card">
 
                     <div className="detail-summary-icon">
-                        👤
+                        <Icon name="user" />
                     </div>
 
                     <div>
@@ -290,7 +272,7 @@ function OrderDetail({
                         </strong>
 
                         <small>
-                            📞{" "}
+                            <Icon name="phone" />{" "}
                             {cliente?.telefono ||
                                 "Sin teléfono"}
                         </small>
@@ -302,7 +284,7 @@ function OrderDetail({
                 <div className="detail-summary-card">
 
                     <div className="detail-summary-icon">
-                        📅
+                        <Icon name="calendar" />
                     </div>
 
                     <div>
@@ -328,7 +310,7 @@ function OrderDetail({
                 <div className="detail-summary-card">
 
                     <div className="detail-summary-icon">
-                        💰
+                        <Icon name="wallet" />
                     </div>
 
                     <div>
@@ -366,8 +348,8 @@ function OrderDetail({
                     <div className="detail-summary-icon">
                         {pedidoActual.prioridad ===
                         "Urgente"
-                            ? "🔴"
-                            : "🟢"}
+                            ? <Icon name="alert" />
+                            : <Icon name="checkCircle" />}
                     </div>
 
                     <div>
@@ -410,7 +392,7 @@ function OrderDetail({
                         <div>
 
                             <h2>
-                                🧵 Trabajos del pedido
+                                <Icon name="thread" /> Trabajos del pedido
                             </h2>
 
                             <p>
@@ -496,7 +478,7 @@ function OrderDetail({
                                             <div className="detail-garment-description">
 
                                                 <span>
-                                                    📝 Descripción
+                                                    <Icon name="note" /> Descripción
                                                 </span>
 
                                                 <p>
@@ -558,7 +540,7 @@ function OrderDetail({
                         <div className="detail-panel-header-simple">
 
                             <h2>
-                                📌 Estado
+                                <Icon name="pin" /> Estado
                             </h2>
 
                         </div>
@@ -595,8 +577,8 @@ function OrderDetail({
                             >
                                 {pedidoActual.prioridad ===
                                 "Urgente"
-                                    ? "🔴 Urgente"
-                                    : "🟢 Normal"}
+                                    ? "Urgente"
+                                    : "Normal"}
                             </strong>
 
                         </div>
@@ -610,7 +592,7 @@ function OrderDetail({
                         <div className="detail-panel-header-simple">
 
                             <h2>
-                                💰 Pago
+                                <Icon name="wallet" /> Pago
                             </h2>
 
                         </div>
@@ -680,7 +662,7 @@ function OrderDetail({
                     <div className="detail-panel-header-simple">
 
                         <h2>
-                            📝 Notas
+                            <Icon name="note" /> Notas
                         </h2>
 
                     </div>
@@ -700,7 +682,7 @@ function OrderDetail({
                             <div className="detail-no-notes">
 
                                 <span>
-                                    📝
+                                    <Icon name="note" />
                                 </span>
 
                                 <div>
@@ -746,7 +728,7 @@ function OrderDetail({
                         setEditando(true)
                     }
                 >
-                    ✏️ Editar pedido
+                    <Icon name="edit" /> Editar pedido
                 </button>
 
             </div>
