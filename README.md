@@ -92,7 +92,7 @@ Pedidos tiene dos solapas:
 - **Activos**: Pendiente, En proceso y Listo. Un trabajo pagado sigue activo hasta que se entregue.
 - **Antiguos**: únicamente los pedidos con estado Entregado. Conservan cliente, prendas, importes, notas y saldo.
 
-Marcar listo prepara el aviso editable de WhatsApp. **Marcar entregado** pide confirmar que la prenda ya fue retirada y mueve el pedido a Antiguos. **Reactivar** lo devuelve a Activos con estado En proceso. Ninguna de estas acciones cobra, marca como pagado ni modifica la seña. Los pedidos entregados con saldo continúan mostrando esa deuda y siguen incluidos en Ganancias según su fecha prevista.
+**Cambiar estado**, disponible en cada tarjeta de Activos y Antiguos, abre Pendiente, En proceso, Listo para retirar y Entregado. Se destaca el estado actual y se guarda con confirmación; cancelar no cambia nada. Elegir Listo prepara el aviso editable de WhatsApp. Entregado pide confirmar que la prenda ya fue retirada y mueve el pedido a Antiguos. Cualquier otro estado lo devuelve a Activos. Ninguna de estas acciones cobra, marca como pagado ni modifica la seña. Los pedidos entregados con saldo continúan mostrando esa deuda y siguen incluidos en Ganancias según su fecha prevista.
 
 La vista diaria prioriza atrasados, entregas de hoy y urgentes; también permite ordenar por fecha prevista o cliente. El historial muestra primero las fechas previstas recientes: no representa una fecha real de retiro, que la base actual no registra.
 
@@ -102,4 +102,15 @@ La lista muestra 10 pedidos por página. Buscar o cambiar filtros vuelve a la pr
 
 Las tarjetas muestran cliente y estado, trabajos, entrega prevista e importes antes de las acciones. Eliminar queda dentro de Más opciones y mantiene su confirmación; no es necesario borrar un pedido para sacarlo de Activos. Los accesos de Inicio a Urgentes, En proceso, Listos, Hoy y Atrasados abren sus filtros correspondientes.
 
-Para verificar: abrir un pedido Listo con seña parcial, confirmar la entrega y comprobar que pasa a Antiguos con el mismo saldo. Reactivarlo y comprobar que vuelve a Activos. Repetir cambiando el estado desde Editar, buscar en ambas solapas, filtrar por saldo y probar la paginación. Los diálogos admiten Escape para cancelar y las solapas se recorren con las flechas del teclado.
+Para verificar: abrir un pedido Listo con seña parcial, confirmar la entrega y comprobar que pasa a Antiguos con el mismo saldo. Cambiarlo a En proceso y comprobar que vuelve a Activos. Repetir cambiando el estado desde Editar, buscar en ambas solapas, filtrar por saldo y probar la paginación. Los diálogos admiten Escape para cancelar y las solapas se recorren con las flechas del teclado.
+
+
+## Ganancias por semana
+
+La pantalla reúne un saldo por cobrar destacado, el porcentaje del valor cubierto por pagos, el valor total de los trabajos, los pagos registrados y la cantidad de pedidos. Se puede recorrer semanas con Anterior/Siguiente, volver a Hoy o elegir cualquier fecha; siempre se consulta de lunes a domingo.
+
+El detalle muestra cliente, número, entrega prevista, estado, valor, pagos y saldo. Se ordena por mayor saldo y permite filtrar Todos, Con saldo y Sin saldo. Cambiar de semana restablece Todos. Se conservan los pedidos Entregados con deuda. Las cantidades y los precios unitarios se calculan con las mismas reglas que en Pedidos.
+
+Se agrupa por **fecha prevista de entrega**, no por fecha del cobro: la base no registra cada movimiento de dinero ni gastos. Pagos registrados incluye señas y pedidos marcados como pagados; no representa ganancia neta ni ingresos recibidos durante esa semana.
+
+Para verificar: cambiar un pedido de Pendiente a En proceso desde su tarjeta; cancelar otro cambio; marcarlo Listo y revisar el WhatsApp editable; confirmar Entregado y comprobar que solo cambia el estado y pasa a Antiguos. Cambiarlo nuevamente a Pendiente y comprobar que vuelve a Activos. En Ganancias, elegir una semana con pagos parciales, completos y pedidos antiguos, filtrar saldos, recorrer semanas y volver a Hoy. Probar también una semana vacía y pantallas de 320 px.

@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import Icon from "../components/Icon";
 import OrganizedOrderCard from "../components/OrganizedOrderCard";
 import OrderDialog from "../components/OrderDialog";
+import OrderStatusDialog from "../components/OrderStatusDialog";
 import WhatsAppMessage from "../components/WhatsAppMessage";
 import EditOrder from "./EditOrder";
 import OrderDetail from "./OrderDetail";
@@ -12,7 +13,7 @@ import {
     organizarPedidos,
     resumenOrganizacion,
 } from "../lib/orderOrganization";
-import { formatearDinero, resumenPago } from "../lib/orderTotals";
+import { formatearDinero } from "../lib/orderTotals";
 import { useWorkshopSettings } from "../hooks/useWorkshopSettings";
 import "./Orders.css";
 import "./OrdersOrganization.css";
@@ -53,6 +54,7 @@ export default function Orders({
     const [detalle, setDetalle] = useState(null);
     const [aviso, setAviso] = useState(null);
     const [confirmacion, setConfirmacion] = useState(null);
+    const [cambioEstado, setCambioEstado] = useState(null);
     const [ocupado, setOcupado] = useState(false);
     const [errorAccion, setErrorAccion] = useState("");
     const [resultado, setResultado] = useState(null);
@@ -120,18 +122,18 @@ export default function Orders({
                 .single();
             if (error) throw error;
             onOrderChanged?.(data);
-            setConfirmacion(null);
+            setCambioEstado(null);
             setResultado({
                 texto:
                     estado === "Entregado"
                         ? `El pedido de ${data.clientes?.nombre || "tu cliente"} pasó a Antiguos.`
-                        : estado === "En proceso"
-                          ? "El pedido volvió a Activos."
-                          : "Pedido listo para retirar.",
+                        : esAntiguo(pedido)
+                          ? `El pedido volvió a Activos: ${estado === "Listo" ? "Listo para retirar" : estado}.`
+                          : `Estado actualizado: ${estado === "Listo" ? "Listo para retirar" : estado}.`,
                 solapa:
                     estado === "Entregado"
                         ? "Antiguos"
-                        : estado === "En proceso"
+                        : esAntiguo(pedido)
                           ? "Activos"
                           : null,
             });
@@ -352,7 +354,7 @@ export default function Orders({
                         )}
                     </div>
                 )}
-                {errorAccion && !confirmacion && (
+                {errorAccion && !confirmacion && !cambioEstado && (
                     <p className="form-error-banner" role="alert">
                         {errorAccion}
                     </p>
@@ -556,15 +558,10 @@ export default function Orders({
                                     ocupado={ocupado}
                                     onView={setDetalle}
                                     onEdit={setEditando}
-                                    onReady={(pedido) =>
-                                        actualizarEstado(pedido, "Listo")
-                                    }
-                                    onDeliver={(pedido) =>
-                                        abrirConfirmacion("entregar", pedido)
-                                    }
-                                    onReactivate={(pedido) =>
-                                        abrirConfirmacion("reactivar", pedido)
-                                    }
+                                    onChangeState={(pedido) => {
+                                        setErrorAccion("");
+                                        setCambioEstado(pedido);
+                                    }}
                                     onWhatsapp={setAviso}
                                     onDelete={(pedido) =>
                                         abrirConfirmacion("eliminar", pedido)
@@ -666,21 +663,25 @@ export default function Orders({
                     </button>
                 </OrderDialog>
             )}
+            {cambioEstado && (
+                <OrderStatusDialog
+                    pedido={cambioEstado}
+                    ocupado={ocupado}
+                    error={errorAccion}
+                    onSave={(estado) => actualizarEstado(cambioEstado, estado)}
+                    onClose={() => {
+                        setCambioEstado(null);
+                        setErrorAccion("");
+                    }}
+                />
+            )}
             {confirmacion && (
                 <OrderDialog
-                    titulo={
-                        confirmacion.tipo === "eliminar"
-                            ? "¿Eliminar pedido?"
-                            : confirmacion.tipo === "entregar"
-                              ? "¿La prenda ya fue retirada?"
-                              : "¿Reactivar este pedido?"
-                    }
+                    titulo="¿Eliminar pedido?"
                     ocupado={ocupado}
                     onClose={() => {
-                        if (!ocupado) {
-                            setConfirmacion(null);
-                            setErrorAccion("");
-                        }
+                        setConfirmacion(null);
+                        setErrorAccion("");
                     }}
                 >
                     <p>
@@ -692,23 +693,9 @@ export default function Orders({
                         .
                     </p>
                     <p>
-                        {confirmacion.tipo === "eliminar"
-                            ? "Se eliminará definitivamente. Para conservar un trabajo resuelto, usá Marcar entregado."
-                            : confirmacion.tipo === "entregar"
-                              ? "Pasará a la solapa Antiguos para conservarlo en el historial."
-                              : "Volverá a Activos con estado En proceso."}
+                        Se eliminará definitivamente. Para conservar un trabajo
+                        resuelto, cambiá su estado a Entregado.
                     </p>
-                    {confirmacion.tipo !== "eliminar" && (
-                        <p className="order-confirm-balance">
-                            Saldo pendiente:{" "}
-                            <strong>
-                                {formatearDinero(
-                                    resumenPago(confirmacion.pedido).saldo,
-                                )}
-                            </strong>
-                            . Esta acción no cambia los pagos.
-                        </p>
-                    )}
                     {errorAccion && (
                         <p className="field-error" role="alert">
                             {errorAccion}
@@ -728,30 +715,11 @@ export default function Orders({
                         </button>
                         <button
                             type="button"
-                            className={
-                                confirmacion.tipo === "eliminar"
-                                    ? "organized-danger"
-                                    : "organized-primary"
-                            }
+                            className="organized-danger"
                             disabled={ocupado}
-                            onClick={() =>
-                                confirmacion.tipo === "eliminar"
-                                    ? eliminar()
-                                    : actualizarEstado(
-                                          confirmacion.pedido,
-                                          confirmacion.tipo === "entregar"
-                                              ? "Entregado"
-                                              : "En proceso",
-                                      )
-                            }
+                            onClick={eliminar}
                         >
-                            {ocupado
-                                ? "Guardando…"
-                                : confirmacion.tipo === "eliminar"
-                                  ? "Sí, eliminar"
-                                  : confirmacion.tipo === "entregar"
-                                    ? "Confirmar entrega"
-                                    : "Reactivar pedido"}
+                            {ocupado ? "Eliminando…" : "Sí, eliminar"}
                         </button>
                     </div>
                 </OrderDialog>
