@@ -1,3 +1,4 @@
+import Icon from "../components/Icon";
 
 import { useMemo, useState } from "react";
 import { resumenPago } from "../lib/orderTotals";
@@ -98,7 +99,7 @@ function Earnings({ pedidos = [] }) {
         <div className="earnings-page">
             <header className="orders-header">
                 <div>
-                    <h1>Ganancias 💰</h1>
+                    <h1>Ganancias</h1>
                     <p>
                         Consultá cuánto tenés previsto cobrar por los pedidos
                         de cada semana.
@@ -109,7 +110,7 @@ function Earnings({ pedidos = [] }) {
             {/* Resumen del dinero que falta cobrar */}
             <section className="weekly-collection-card">
                 <div className="weekly-collection-icon" aria-hidden="true">
-                    💰
+                    <Icon name="wallet" />
                 </div>
 
                 <div className="weekly-collection-info">
@@ -136,7 +137,7 @@ function Earnings({ pedidos = [] }) {
             <section className="dashboard-stats">
                 <div className="dashboard-stat-card process">
                     <div className="dashboard-stat-icon" aria-hidden="true">
-                        🧵
+                        <Icon name="thread" />
                     </div>
 
                     <div>
@@ -148,7 +149,7 @@ function Earnings({ pedidos = [] }) {
 
                 <div className="dashboard-stat-card ready">
                     <div className="dashboard-stat-icon" aria-hidden="true">
-                        💵
+                        <Icon name="wallet" />
                     </div>
 
                     <div>
@@ -203,7 +204,7 @@ function Earnings({ pedidos = [] }) {
                 {resumen.deLaSemana.length === 0 ? (
                     <div className="orders-empty">
                         <div className="empty-icon" aria-hidden="true">
-                            📋
+                            <Icon name="orders" />
                         </div>
 
                         <h2>No hay pedidos esta semana</h2>

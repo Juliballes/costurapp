@@ -1,3 +1,4 @@
+import Icon, { GarmentIcon } from "../components/Icon";
 import { useState } from "react";
 import { resumenPago, subtotalPrenda } from "../lib/orderTotals";
 import { mensajeRetiro, enlaceWhatsapp } from "../lib/whatsapp";
@@ -57,30 +58,7 @@ function Orders({
     // ICONOS
     // =====================================================
 
-    const obtenerIcono = (tipo) => {
-        switch (tipo) {
-            case "Vestido":
-                return "👗";
-
-            case "Pantalón":
-                return "👖";
-
-            case "Blusa":
-                return "👚";
-
-            case "Camisa":
-                return "👔";
-
-            case "Saco":
-                return "🧥";
-
-            case "Falda":
-                return "👗";
-
-            default:
-                return "🧵";
-        }
-    };
+    const obtenerIcono = (tipo) => <GarmentIcon tipo={tipo} />;
 
     // =====================================================
     // FECHA
@@ -128,18 +106,18 @@ function Orders({
 
     const obtenerTextoEstado = (estado) => {
         if (estado === "Listo") {
-            return "🟢 Listo";
+            return "Listo";
         }
 
         if (estado === "Entregado") {
-            return "⚪ Entregado";
+            return "Entregado";
         }
 
         if (estado === "Pendiente") {
-            return "⚪ Pendiente";
+            return "Pendiente";
         }
 
-        return "🟡 En proceso";
+        return "En proceso";
     };
 
     // =====================================================
@@ -444,7 +422,7 @@ function Orders({
 
                 <div>
                     <h1>
-                        Pedidos 🧵
+                        Pedidos
                     </h1>
 
                     <p>
@@ -466,7 +444,7 @@ function Orders({
                         className="new-order-button"
                         onClick={onNewOrder}
                     >
-                        ＋ Nuevo pedido
+                        <Icon name="plus" /> Nuevo pedido
                     </button>
 
                 </div>
@@ -489,7 +467,7 @@ function Orders({
             setFiltroFecha("Todos")
         }
     >
-        📋 Todos
+        <Icon name="orders" /> Todos
     </button>
 
     <button
@@ -503,7 +481,7 @@ function Orders({
             setFiltroFecha("Hoy")
         }
     >
-        📅 Hoy
+        <Icon name="calendar" /> Hoy
     </button>
 
     <button
@@ -545,7 +523,7 @@ function Orders({
             setFiltroFecha("Vencidos")
         }
     >
-        🔴 Atrasados
+        <Icon name="alert" /> Atrasados
     </button>
 
 </div>
@@ -553,7 +531,7 @@ function Orders({
                 <div className="search-box">
 
                     <span>
-                        🔎
+                        <Icon name="search" />
                     </span>
 
                     <input
@@ -631,7 +609,7 @@ function Orders({
                 <div className="orders-empty">
 
                     <div className="empty-icon">
-                        📋
+                        <Icon name="orders" />
                     </div>
 
                     <h2>
@@ -647,7 +625,7 @@ function Orders({
                         className="new-order-button"
                         onClick={onNewOrder}
                     >
-                        ＋ Crear pedido
+                        <Icon name="plus" /> Crear pedido
                     </button>
 
                 </div>
@@ -703,7 +681,7 @@ function Orders({
                                                 "Urgente" && (
 
                                                 <span className="priority-badge">
-                                                    🔴 Urgente
+                                                    <Icon name="alert" /> Urgente
                                                 </span>
 
                                             )}
@@ -813,7 +791,7 @@ function Orders({
                                     <div className="order-info-block">
 
                                         <span>
-                                            📅 Entrega
+                                            <Icon name="calendar" /> Entrega
                                         </span>
 
                                         <strong>
@@ -831,7 +809,7 @@ function Orders({
                                         <div>
 
                                             <span>
-                                                💰 Total
+                                                <Icon name="wallet" /> Total
                                             </span>
 
                                             <strong>
@@ -845,7 +823,7 @@ function Orders({
                                         <div>
 
                                             <span>
-                                                💳 Saldo
+                                                <Icon name="wallet" /> Saldo
                                             </span>
 
                                             <strong
@@ -904,7 +882,7 @@ function Orders({
 
                                             )}
 
-                                        {pedido.estado === "Listo" && <button type="button" className="whatsapp-order-button" onClick={() => setPedidoListo(pedido)}>💬 Avisar por WhatsApp</button>}
+                                        {pedido.estado === "Listo" && <button type="button" className="whatsapp-order-button" aria-label="Avisar por WhatsApp" onClick={() => setPedidoListo(pedido)}><Icon name="message" /> Avisar</button>}
 
                                         <button
                                             type="button"
@@ -915,7 +893,7 @@ function Orders({
                                                 )
                                             }
                                         >
-                                            👁️ Ver pedido
+                                            <Icon name="eye" /> Ver pedido
                                         </button>
 
                                         <button
@@ -930,7 +908,7 @@ function Orders({
                                                 actualizando
                                             }
                                         >
-                                            ✏️ Editar
+                                            <Icon name="edit" /> Editar
                                         </button>
 
                                         <button
@@ -945,7 +923,7 @@ function Orders({
                                                 actualizando
                                             }
                                         >
-                                            🗑️ Eliminar
+                                            <Icon name="trash" /> Eliminar
                                         </button>
 
                                     </div>
@@ -983,7 +961,7 @@ function Orders({
                     >
 
                         <div className="status-modal-icon">
-                            ✅
+                            <Icon name="checkCircle" />
                         </div>
 
                         <h2>
@@ -1016,7 +994,7 @@ function Orders({
                                 target="_blank"
                                 rel="noreferrer"
                             >
-                                💬 Avisar por WhatsApp
+                                <Icon name="message" /> Avisar por WhatsApp
                             </a>
 
                         ) : (
@@ -1024,7 +1002,7 @@ function Orders({
                             <div className="no-phone-message">
 
                                 <span>
-                                    📱
+                                    <Icon name="phone" />
                                 </span>
 
                                 <p>
@@ -1071,7 +1049,7 @@ function Orders({
                     >
 
                         <div className="delete-modal-icon">
-                            🗑️
+                            <Icon name="trash" />
                         </div>
 
                         <h2>
@@ -1121,7 +1099,7 @@ function Orders({
                                 {eliminandoPedidoId ===
                                 pedidoAEliminar.id
                                     ? "Eliminando..."
-                                    : "🗑️ Sí, eliminar"}
+                                    : "Sí, eliminar"}
                             </button>
 
                         </div>
