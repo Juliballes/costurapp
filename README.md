@@ -35,11 +35,11 @@ Los pedidos pagados tienen saldo cero y su seña representa el total. El campo `
 El aviso usa el nombre del cliente automáticamente, conserva los saltos de línea y abre WhatsApp con este texto preparado:
 
 ```text
-Hola [nombre]👋🏻 soy Mariana de Mhome
+Hola [nombre], soy Mariana de Mhome
 
 Tu prenda ya está lista para retirar.
 
-¡Muchas gracias! 🥰.
+¡Muchas gracias!
 ```
 
 El envío lo confirma la persona desde WhatsApp.
@@ -77,3 +77,10 @@ Las prendas existentes conservan sus IDs. Las bajas se realizan al final. Si una
 7. Simular un error de carga y reintentar; no debe desaparecer la información anterior. Simular errores de guardado con un entorno de prueba y comprobar el borrador y las reversiones.
 
 La validación automatizada cubre reglas de negocio y persistencia con una base simulada. Las pruebas de interfaz se realizaron con respuestas simuladas de Supabase, sin modificar pedidos reales.
+
+
+## Edición del aviso de retiro
+
+Los mensajes se preparan sin emojis, incluyendo las plantillas guardadas con el formato anterior. Se conservan el nombre del taller, el remitente, el texto personalizado y los saltos de línea. También se eliminan los caracteres de reemplazo `�` de plantillas antiguas.
+
+La vista previa es un campo editable: al escribir, el enlace de WhatsApp se actualiza con ese texto exacto. La edición corresponde solo al aviso abierto y no cambia la plantilla de Configuración. Cerrar el diálogo y volver a abrirlo recupera la plantilla. Un mensaje vacío deja deshabilitada la apertura de WhatsApp. El enlace usa la dirección directa de WhatsApp y codifica el texto una sola vez.

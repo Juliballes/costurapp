@@ -40,8 +40,8 @@ test('la seña parcial se descuenta del total y el saldo nunca es negativo', () 
     assert.equal(resumenPago({ precio: 1000, sena: 1500 }).saldo, 0);
 });
 
-test('el mensaje de retiro usa el nombre, los emojis y los saltos solicitados', () => {
-    assert.equal(mensajeRetiro('  Ana María  '), 'Hola Ana María👋🏻 soy Mariana de Mhome\n\nTu prenda ya está lista para retirar.\n\n¡Muchas gracias! 🥰.');
+test('el mensaje de retiro usa el nombre y los saltos sin emojis', () => {
+    assert.equal(mensajeRetiro('  Ana María  '), 'Hola Ana María, soy Mariana de Mhome\n\nTu prenda ya está lista para retirar.\n\n¡Muchas gracias!');
     assert.equal(mensajeRetiro('   '), mensajeRetiro());
     const texto = mensajeRetiro('Ana & Sol');
     assert.equal(new URL(`https://wa.me/5491112345678?text=${encodeURIComponent(texto)}`).searchParams.get('text'), texto);

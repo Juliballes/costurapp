@@ -1,5 +1,9 @@
 import { useSyncExternalStore } from "react";
-import { configuracionInicial, validarConfiguracion } from "../lib/workshop";
+import {
+    configuracionInicial,
+    validarConfiguracion,
+    quitarEmojis,
+} from "../lib/workshop";
 
 const clave = "costurapp.configuracion.v1";
 let ultimoTexto;
@@ -14,7 +18,7 @@ function leer() {
             ultimaConfiguracion = Object.keys(validarConfiguracion(valor))
                 .length
                 ? configuracionInicial
-                : valor;
+                : { ...valor, plantilla: quitarEmojis(valor.plantilla) };
         }
     } catch {
         ultimaConfiguracion = configuracionInicial;
@@ -39,7 +43,7 @@ export function guardarConfiguracion(config) {
     const valor = {
         taller: config.taller.trim(),
         remitente: config.remitente.trim(),
-        plantilla: config.plantilla.trim(),
+        plantilla: quitarEmojis(config.plantilla),
     };
     if (Object.keys(validarConfiguracion(valor)).length)
         throw new Error("Revisá los campos de configuración.");

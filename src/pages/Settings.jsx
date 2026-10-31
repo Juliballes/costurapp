@@ -121,7 +121,7 @@ export default function Settings() {
                         />
                         <small className="section-help" id="ayuda-plantilla">
                             Usá {"{nombre}"}, {"{remitente}"} y {"{taller}"}{" "}
-                            para completar los datos automáticamente.
+                            para completar los datos automáticamente. Los avisos se preparan sin emojis.
                         </small>
                         {errores.plantilla && (
                             <small className="field-error" id="error-plantilla">
