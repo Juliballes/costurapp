@@ -2,6 +2,8 @@ body.work-order-open {
     overflow: hidden;
 }
 .work-order-dialog {
+    /* El comprobante conserva su diseño claro aunque el navegador use modo oscuro. */
+    color-scheme: only light;
     box-sizing: border-box;
     width: min(980px, calc(100vw - 24px));
     max-width: none;
@@ -130,6 +132,9 @@ body.work-order-open {
     padding: 26px;
 }
 .work-order-document {
+    color-scheme: only light;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
     position: relative;
     width: 100%;
     min-width: 650px;
@@ -307,8 +312,8 @@ body.work-order-open {
 }
 .receipt-items th {
     background: #8f9f80;
-    color: #fff;
-    font-weight: 500;
+    color: #1f2d23;
+    font-weight: 600;
     padding-block: 11px;
 }
 .receipt-items th:nth-child(n + 3),
@@ -318,6 +323,13 @@ body.work-order-open {
 }
 .receipt-items td:first-child {
     text-align: center;
+}
+.receipt-items tbody {
+    background: #fffdf7;
+    color: #27352b;
+}
+.receipt-items td {
+    color: #27352b;
 }
 .receipt-empty-row {
     height: 35px;
@@ -331,6 +343,8 @@ body.work-order-open {
     gap: 18px;
 }
 .receipt-observations {
+    background: #fffdf7;
+    color: #27352b;
     border: 1px solid #65725a;
     padding: 12px;
     min-width: 0;
@@ -347,6 +361,8 @@ body.work-order-open {
     line-height: 1.6;
 }
 .receipt-totals {
+    background: #fffdf7;
+    color: #27352b;
     margin: 0;
     border: 1px solid #65725a;
     font-size: 12px;
@@ -548,6 +564,9 @@ body.work-order-open {
 }
 .receipt-export-node {
     width: 794px;
+    color-scheme: only light;
+    background: #fffdf7;
+    color: #27352b;
 }
 .receipt-export-node .work-order-document {
     width: 794px;

@@ -123,6 +123,8 @@ Se puede abrir nuevamente desde **Generar boleta** en cada tarjeta de Pedidos o 
 
 El diseño usa el logo suministrado de Mhome, tonos crema y verde, el título **ORDEN DE TRABAJO** y el nombre **Mariana**. Conserva el aviso “Documento no válido como factura”. No incluye número ni firmas. Completa nombre y teléfono del cliente, prendas, cantidades, descripción, precios unitarios, subtotales, observaciones, entrega, total, seña/pagos y saldo. Usa las mismas reglas de cantidades y centavos que Pedidos; los pedidos antiguos sin prendas conservan su importe.
 
+La boleta mantiene el fondo crema original, los detalles verde salvia y el texto oscuro también cuando el dispositivo usa modo oscuro. La vista previa, la imagen descargada y la impresión usan esa misma paleta. Los encabezados de tabla tienen texto oscuro sobre verde salvia para distinguir mejor los títulos.
+
 Los contactos iniciales son **+54 9 11 5954-5739** y **@mhome.larra**. Se pueden cambiar en Configuración, que sigue guardándose en ese navegador. Las configuraciones anteriores conservan su plantilla y reciben los contactos iniciales sin tener que restablecer los datos. Instagram admite usuario, arroba o enlace de Instagram.
 
 Dirección del cliente es opcional y se puede completar en la vista de la boleta. También se pueden ajustar las observaciones. Estos cambios son solo para la boleta abierta y actualizan su imagen; no modifican el pedido ni se guardan como domicilio del cliente. Para cambiar cliente, trabajos o importes, editar el pedido y volver a generar su boleta.
