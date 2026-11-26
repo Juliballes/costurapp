@@ -2,6 +2,7 @@ import "./Layout.css";
 import "../pages/OrderForm.css";
 import { useWorkshopSettings } from "../hooks/useWorkshopSettings";
 import Icon from "./Icon";
+import WorkOrderReceipt from "./WorkOrderReceipt";
 
 const secciones = [
     { id: "dashboard", nombre: "Inicio", icono: "home" },
@@ -111,6 +112,7 @@ export default function Layout({
                     </div>
                 )}
                 {children}
+                <WorkOrderReceipt />
             </main>
         </div>
     );

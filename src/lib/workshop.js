@@ -1,6 +1,11 @@
+import { normalizarTelefono } from "./phone.js";
+import { normalizarInstagram } from "./workOrder.js";
+
 export const configuracionInicial = Object.freeze({
     taller: "Mhome",
     remitente: "Mariana",
+    telefono: "+54 9 11 5954-5739",
+    instagram: "mhome.larra",
     plantilla:
         "Hola {nombre}, soy {remitente} de {taller}\n\nTu prenda ya está lista para retirar.\n\n¡Muchas gracias!",
 });
@@ -22,6 +27,11 @@ export function validarConfiguracion(config) {
     )
         errores.plantilla =
             "Usá solamente {nombre}, {remitente} y {taller} como campos automáticos.";
+    if (config.telefono?.trim() && !normalizarTelefono(config.telefono))
+        errores.telefono = "Ingresá un teléfono válido con código de área.";
+    if (normalizarInstagram(config.instagram) === null)
+        errores.instagram =
+            "Ingresá un usuario válido de Instagram, por ejemplo mhome.larra.";
     return errores;
 }
 

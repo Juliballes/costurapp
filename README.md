@@ -114,3 +114,30 @@ El detalle muestra cliente, número, entrega prevista, estado, valor, pagos y sa
 Se agrupa por **fecha prevista de entrega**, no por fecha del cobro: la base no registra cada movimiento de dinero ni gastos. Pagos registrados incluye señas y pedidos marcados como pagados; no representa ganancia neta ni ingresos recibidos durante esa semana.
 
 Para verificar: cambiar un pedido de Pendiente a En proceso desde su tarjeta; cancelar otro cambio; marcarlo Listo y revisar el WhatsApp editable; confirmar Entregado y comprobar que solo cambia el estado y pasa a Antiguos. Cambiarlo nuevamente a Pendiente y comprobar que vuelve a Activos. En Ganancias, elegir una semana con pagos parciales, completos y pedidos antiguos, filtrar saldos, recorrer semanas y volver a Hoy. Probar también una semana vacía y pantallas de 320 px.
+
+## Boleta · Orden de trabajo
+
+Al completar **Crear y generar boleta**, se guarda el pedido y se abre su boleta. Solo aparece después de confirmar cliente, cabecera y prendas; si falla el guardado se conserva el formulario y no se genera una boleta de un pedido incompleto. Si solo falla refrescar la lista, se conserva la boleta del guardado confirmado y se informa el error de conexión.
+
+Se puede abrir nuevamente desde **Generar boleta** en cada tarjeta de Pedidos o en el detalle, incluidos pedidos antiguos. Reabrirla toma los importes actuales del pedido y genera una nueva fecha de emisión. Crear y cerrar una boleta no cambia datos ni vuelve a crear el pedido.
+
+El diseño usa el logo suministrado de Mhome, tonos crema y verde, el título **ORDEN DE TRABAJO** y el nombre **Mariana**. Conserva el aviso “Documento no válido como factura”. No incluye número ni firmas. Completa nombre y teléfono del cliente, prendas, cantidades, descripción, precios unitarios, subtotales, observaciones, entrega, total, seña/pagos y saldo. Usa las mismas reglas de cantidades y centavos que Pedidos; los pedidos antiguos sin prendas conservan su importe.
+
+Los contactos iniciales son **+54 9 11 5954-5739** y **@mhome.larra**. Se pueden cambiar en Configuración, que sigue guardándose en ese navegador. Las configuraciones anteriores conservan su plantilla y reciben los contactos iniciales sin tener que restablecer los datos. Instagram admite usuario, arroba o enlace de Instagram.
+
+Dirección del cliente es opcional y se puede completar en la vista de la boleta. También se pueden ajustar las observaciones. Estos cambios son solo para la boleta abierta y actualizan su imagen; no modifican el pedido ni se guardan como domicilio del cliente. Para cambiar cliente, trabajos o importes, editar el pedido y volver a generar su boleta.
+
+### Imagen y WhatsApp
+
+La app genera una imagen PNG del documento completo, con el logo incluido. El botón **Enviar por WhatsApp** se habilita cuando termina la generación y el cliente tiene un teléfono válido. **Descargar imagen** funciona también para pedidos antiguos sin un número válido.
+
+- Con Web Share de archivos, se comparte un archivo PNG real mediante el sistema. La persona debe elegir WhatsApp y el contacto que se muestra en pantalla; la API de compartir no permite preseleccionar ese contacto ni confirmar su entrega.
+- Si el navegador no admite compartir archivos, se descarga el PNG y se abre el chat del número normalizado del cliente con un texto de orden de trabajo. La persona debe **adjuntar la imagen descargada y confirmar el envío**. Los enlaces de chat no adjuntan archivos automáticamente.
+- Cancelar la pantalla de compartir no registra un envío ni genera otra descarga. La imagen queda disponible para volver a intentar.
+- La generación ocurre en el navegador, sin subir la boleta o sus datos a servicios de imágenes. El generador se carga cuando se abre la boleta y reduce la resolución para documentos muy extensos. La vista es una instantánea del pedido confirmado; los refrescos no cambian una boleta abierta.
+
+El mensaje que acompaña esta imagen dice “Te envío tu orden de trabajo”; no usa el aviso “Tu prenda ya está lista para retirar” porque el trabajo recién se creó. El aviso de retiro existente se conserva.
+
+También se ofrece **Imprimir / Guardar PDF** con formato A4. Un pedido habitual cabe en una página; los pedidos extensos continúan en páginas adicionales con encabezados de tabla repetidos. La impresión excluye menús, botones y campos auxiliares. En la ventana de impresión se puede elegir Guardar como PDF.
+
+No requiere cambios en Supabase ni migraciones. La generación de PNG usa `html-to-image` con importación dinámica. La dirección opcional y la imagen no agregan campos a la base.

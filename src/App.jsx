@@ -1,4 +1,5 @@
 import Icon, { GarmentIcon } from "./components/Icon";
+import { useWorkOrder } from "./context/WorkOrderContext";
 import { useEffect, useRef, useState } from "react";
 
 import Calendar from "./pages/Calendar";
@@ -15,6 +16,7 @@ import { cargarTodosLosPedidos } from "./lib/orderRepository";
 
 function App() {
     const configuracion = useWorkshopSettings();
+    const { abrirBoleta } = useWorkOrder();
     const [page, setPageActual] = useState("dashboard");
     const [versionNavegacion, setVersionNavegacion] = useState(0);
     const setPage = (pagina) => navegar(() => {
@@ -308,9 +310,12 @@ function App() {
                     onBack={() =>
                         setPage("orders")
                     }
-                    onOrderCreated={async () => {
-                        await cargarPedidos();
+                    onOrderCreated={async (pedido) => {
+                        // Mostrar el resultado confirmado antes de refrescar: no volver a crear si falla la carga.
+                        setPedidos(actuales=>[...actuales.filter(p=>p.id!==pedido.id),pedido]);
                         setPage("orders");
+                        abrirBoleta(pedido);
+                        await cargarPedidos();
                     }}
                 />
             </Layout>
