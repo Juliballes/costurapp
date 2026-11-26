@@ -594,7 +594,7 @@ export default function OrderForm({ pedido, onBack, onSaved }) {
                             ? "Guardando…"
                             : pedido
                               ? "✓ Guardar cambios"
-                              : "✓ Crear pedido"}
+                              : "Crear y generar boleta"}
                     </button>
                 </div>
             </form>

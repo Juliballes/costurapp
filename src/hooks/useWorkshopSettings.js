@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { normalizarInstagram } from "../lib/workOrder";
 import {
     configuracionInicial,
     validarConfiguracion,
@@ -18,7 +19,14 @@ function leer() {
             ultimaConfiguracion = Object.keys(validarConfiguracion(valor))
                 .length
                 ? configuracionInicial
-                : { ...valor, plantilla: quitarEmojis(valor.plantilla) };
+                : {
+                      ...configuracionInicial,
+                      ...valor,
+                      instagram: normalizarInstagram(
+                          valor.instagram ?? configuracionInicial.instagram,
+                      ),
+                      plantilla: quitarEmojis(valor.plantilla),
+                  };
         }
     } catch {
         ultimaConfiguracion = configuracionInicial;
@@ -40,10 +48,20 @@ export function useWorkshopSettings() {
 }
 
 export function guardarConfiguracion(config) {
+    if (
+        normalizarInstagram(
+            config.instagram ?? configuracionInicial.instagram,
+        ) === null
+    )
+        throw new Error("Revisá el usuario de Instagram.");
     const valor = {
         taller: config.taller.trim(),
         remitente: config.remitente.trim(),
         plantilla: quitarEmojis(config.plantilla),
+        telefono: (config.telefono ?? configuracionInicial.telefono).trim(),
+        instagram: normalizarInstagram(
+            config.instagram ?? configuracionInicial.instagram,
+        ),
     };
     if (Object.keys(validarConfiguracion(valor)).length)
         throw new Error("Revisá los campos de configuración.");

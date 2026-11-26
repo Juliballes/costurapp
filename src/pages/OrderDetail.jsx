@@ -1,4 +1,5 @@
 import Icon, { GarmentIcon } from "../components/Icon";
+import { useWorkOrder } from "../context/WorkOrderContext";
 import { useState } from "react";
 import { resumenPago, subtotalPrenda } from "../lib/orderTotals";
 
@@ -11,6 +12,7 @@ function OrderDetail({
     onBack,
     onSaved,
 }) {
+    const { abrirBoleta } = useWorkOrder();
     const [editando, setEditando] =
         useState(false);
 
@@ -173,6 +175,7 @@ function OrderDetail({
             ================================================= */}
 
             <div className="detail-topbar">
+                <button type="button" className="detail-edit-button" onClick={()=>abrirBoleta(pedidoActual)}><Icon name="orders" />Generar boleta</button>
 
                 <button
                     className="detail-back-button"

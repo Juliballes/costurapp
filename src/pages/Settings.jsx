@@ -68,11 +68,21 @@ export default function Settings() {
                     </div>
                 )}
                 <section className="form-section">
-                    <h2><Icon name="thread" /> Tu taller</h2>
+                    <h2>
+                        <Icon name="thread" /> Tu taller
+                    </h2>
                     <div className="form-grid">
                         {[
                             ["taller", "Nombre del taller"],
                             ["remitente", "Nombre de quien saluda"],
+                            [
+                                "telefono",
+                                "WhatsApp del taller (para la boleta)",
+                            ],
+                            [
+                                "instagram",
+                                "Instagram del taller (para la boleta)",
+                            ],
                         ].map(([campo, label]) => (
                             <div className="form-group" key={campo}>
                                 <label htmlFor={`config-${campo}`}>
@@ -104,7 +114,9 @@ export default function Settings() {
                     </div>
                 </section>
                 <section className="form-section">
-                    <h2><Icon name="message" /> Aviso de retiro</h2>
+                    <h2>
+                        <Icon name="message" /> Aviso de retiro
+                    </h2>
                     <div className="form-group">
                         <label htmlFor="config-plantilla">
                             Mensaje de WhatsApp
@@ -121,7 +133,8 @@ export default function Settings() {
                         />
                         <small className="section-help" id="ayuda-plantilla">
                             Usá {"{nombre}"}, {"{remitente}"} y {"{taller}"}{" "}
-                            para completar los datos automáticamente. Los avisos se preparan sin emojis.
+                            para completar los datos automáticamente. Los avisos
+                            se preparan sin emojis.
                         </small>
                         {errores.plantilla && (
                             <small className="field-error" id="error-plantilla">

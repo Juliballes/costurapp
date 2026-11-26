@@ -1,4 +1,5 @@
 import Icon, { GarmentIcon } from "./Icon";
+import { useWorkOrder } from "../context/WorkOrderContext";
 import {
     formatearDinero,
     resumenPago,
@@ -15,6 +16,7 @@ export default function OrganizedOrderCard({
     onWhatsapp,
     onDelete,
 }) {
+    const { abrirBoleta } = useWorkOrder();
     const antiguo = esAntiguo(pedido);
     const { total, saldo } = resumenPago(pedido);
     const prendas = pedido.pedido_prendas?.length
@@ -166,6 +168,7 @@ export default function OrganizedOrderCard({
                         <Icon name="edit" />
                         Editar
                     </button>
+                    <button type="button" className="organized-secondary" disabled={ocupado} onClick={()=>abrirBoleta(pedido)}><Icon name="orders" />Generar boleta</button>
                     <details className="organized-more-actions">
                         <summary
                             aria-label={`Más opciones del pedido ${pedido.id}`}

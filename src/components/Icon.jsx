@@ -1,4 +1,6 @@
 const trazos = {
+    whatsapp: (<><path d="M21 11.5a9 9 0 0 1-13.4 7.8L3 21l1.6-4.7A9 9 0 1 1 21 11.5Z"/><path d="M8 7c-1 2 1 6 4 8 2 1 4 0 4-1l-2-1-1 1c-2-1-3-2-4-4l1-1-1-2Z"/></>),
+    instagram: (<><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></>),
     home: (
         <>
             <path d="m3 10 9-7 9 7" />
