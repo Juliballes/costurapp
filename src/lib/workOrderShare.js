@@ -9,38 +9,20 @@ export function descargarImagenBoleta(blob, nombre) {
     window.setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
-// WhatsApp no acepta adjuntos en los enlaces de chat. En móvil se comparte el archivo
-// mediante el sistema; en otros navegadores se descarga la imagen y se abre el chat.
+// Abrir siempre el chat del teléfono cargado. Web Share no permite elegir el
+// destinatario y obliga a buscarlo manualmente. El PNG se descarga para adjuntarlo.
 export async function compartirImagenBoleta(
-    { blob, nombre, mensaje, enlace },
+    { blob, nombre, enlace },
     entorno = {},
 ) {
-    const navegador = entorno.navigator ?? navigator;
-    const crearArchivo =
-        entorno.crearArchivo ??
-        ((datos, nombre, opciones) => new File(datos, nombre, opciones));
-    const archivo = crearArchivo([blob], nombre, { type: "image/png" });
-    let admiteArchivos = false;
-    try {
-        admiteArchivos = Boolean(
-            navegador.share && navegador.canShare?.({ files: [archivo] }),
-        );
-    } catch {
-        /* Usar descarga si el navegador rechaza la consulta de capacidad. */
-    }
-    if (admiteArchivos) {
-        await navegador.share({
-            files: [archivo],
-            title: "Orden de trabajo · Mhome",
-            text: mensaje,
-        });
-        return "compartido";
-    }
+    if (!enlace) throw new Error("El cliente no tiene un teléfono válido.");
     const descargar = entorno.descargar ?? descargarImagenBoleta;
     const abrir =
         entorno.abrir ??
         ((url) => window.open(url, "_blank", "noopener,noreferrer"));
-    descargar(blob, nombre);
+    // Abrir durante el clic, antes de la descarga, para conservar la activación
+    // del usuario que requieren los navegadores para permitir una pestaña nueva.
     abrir(enlace);
+    descargar(blob, nombre);
     return "descargado";
 }

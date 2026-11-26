@@ -9,71 +9,48 @@ const datos = () => ({
     blob: new Blob(["imagen"], { type: "image/png" }),
     nombre: "orden-de-trabajo-paula.png",
     mensaje: "Hola Paula, te envío tu orden de trabajo.",
-    enlace: "https://api.whatsapp.com/send?phone=5491112345678",
+    enlace: "https://web.whatsapp.com/send?phone=5491112345678",
 });
 
-test("en un navegador compatible comparte un archivo PNG real y no abre otro chat ni descarga", async () => {
-    let compartido;
-    const resultado = await compartirImagenBoleta(datos(), {
-        navigator: {
-            canShare: ({ files }) => files[0].type === "image/png",
-            share: async (contenido) => {
-                compartido = contenido;
-            },
-        },
-        descargar: () => assert.fail("No debe descargar"),
-        abrir: () => assert.fail("No debe abrir enlace"),
-    });
-    assert.equal(resultado, "compartido");
-    assert.equal(compartido.files.length, 1);
-    assert.equal(compartido.files[0].name, "orden-de-trabajo-paula.png");
-    assert.equal(compartido.files[0].type, "image/png");
-    assert.equal(await compartido.files[0].text(), "imagen");
-    assert.equal(compartido.text, datos().mensaje);
-});
-test("si no se pueden compartir archivos descarga la imagen y abre el chat del destinatario", async () => {
+test("abre directamente el chat del destinatario incluso si el celular admite compartir archivos", async () => {
     const pasos = [];
-    const resultado = await compartirImagenBoleta(datos(), {
+    const contenido = datos();
+    const resultado = await compartirImagenBoleta(contenido, {
         navigator: {
-            canShare: () => false,
-            share: () => assert.fail("No admite archivos"),
-        },
-        descargar: (blob, nombre) => {
-            assert.equal(blob.type, "image/png");
-            pasos.push(nombre);
+            canShare: () => assert.fail("No debe consultar Web Share"),
+            share: () => assert.fail("No debe pedir elegir un contacto"),
         },
         abrir: (url) => pasos.push(url),
+        descargar: (blob, nombre) => {
+            assert.equal(blob, contenido.blob);
+            pasos.push(nombre);
+        },
     });
     assert.equal(resultado, "descargado");
-    assert.deepEqual(pasos, [datos().nombre, datos().enlace]);
+    assert.deepEqual(pasos, [contenido.enlace, contenido.nombre]);
 });
-test("sin Web Share conserva la alternativa de descarga y chat", async () => {
-    let descargas = 0,
-        aperturas = 0;
-    await compartirImagenBoleta(datos(), {
-        navigator: {},
-        descargar: () => descargas++,
-        abrir: () => aperturas++,
+
+test("abre el chat durante el clic y antes de descargar también sin Web Share", async () => {
+    const pasos = [];
+    const pendiente = compartirImagenBoleta(datos(), {
+        abrir: (url) => pasos.push(url),
+        descargar: () => pasos.push("descarga"),
     });
-    assert.equal(descargas, 1);
-    assert.equal(aperturas, 1);
+    // Los efectos ya ocurrieron, antes de esperar ninguna promesa.
+    assert.deepEqual(pasos, [datos().enlace, "descarga"]);
+    await pendiente;
 });
-test("cancelar la pantalla de compartir no envía, descarga ni abre ventanas", async () => {
-    const cancelado = new DOMException("Cancelado", "AbortError");
+
+test("un enlace ausente no abre ventanas ni descarga imágenes", async () => {
     await assert.rejects(
-        compartirImagenBoleta(datos(), {
-            navigator: {
-                canShare: () => true,
-                share: async () => {
-                    throw cancelado;
-                },
-            },
-            descargar: () => assert.fail("Cancelado"),
-            abrir: () => assert.fail("Cancelado"),
+        compartirImagenBoleta({ ...datos(), enlace: null }, {
+            abrir: () => assert.fail("Sin destinatario"),
+            descargar: () => assert.fail("Sin destinatario"),
         }),
-        { name: "AbortError" },
+        /teléfono válido/,
     );
 });
+
 test("el enlace abre el número del cliente con un mensaje de orden, distinto del aviso de retiro", () => {
     const mensaje = mensajeBoleta("Paula", configuracionInicial);
     const url = new URL(
@@ -98,18 +75,15 @@ test("el archivo tiene extensión PNG, fecha local y nombre seguro para descarga
     );
 });
 
-test("si consultar la capacidad de compartir falla ofrece descarga y chat", async () => {
+
+test("si falla la descarga conserva el intento de abrir el chat y comunica el error", async () => {
     const pasos = [];
-    const r = await compartirImagenBoleta(datos(), {
-        navigator: {
-            share: async () => assert.fail("Sin permiso"),
-            canShare: () => {
-                throw new Error("No permitido");
-            },
-        },
-        descargar: () => pasos.push("descarga"),
-        abrir: () => pasos.push("chat"),
-    });
-    assert.equal(r, "descargado");
-    assert.deepEqual(pasos, ["descarga", "chat"]);
+    await assert.rejects(
+        compartirImagenBoleta(datos(), {
+            abrir: (url) => pasos.push(url),
+            descargar: () => { throw new Error("Descarga fallida"); },
+        }),
+        /Descarga fallida/,
+    );
+    assert.deepEqual(pasos, [datos().enlace]);
 });

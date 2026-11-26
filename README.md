@@ -131,9 +131,10 @@ Dirección del cliente es opcional y se puede completar en la vista de la boleta
 
 La app genera una imagen PNG del documento completo, con el logo incluido. El botón **Enviar por WhatsApp** se habilita cuando termina la generación y el cliente tiene un teléfono válido. **Descargar imagen** funciona también para pedidos antiguos sin un número válido.
 
-- Con Web Share de archivos, se comparte un archivo PNG real mediante el sistema. La persona debe elegir WhatsApp y el contacto que se muestra en pantalla; la API de compartir no permite preseleccionar ese contacto ni confirmar su entrega.
-- Si el navegador no admite compartir archivos, se descarga el PNG y se abre el chat del número normalizado del cliente con un texto de orden de trabajo. La persona debe **adjuntar la imagen descargada y confirmar el envío**. Los enlaces de chat no adjuntan archivos automáticamente.
-- Cancelar la pantalla de compartir no registra un envío ni genera otra descarga. La imagen queda disponible para volver a intentar.
+- En celular, el botón abre directamente el chat del número normalizado del cliente en WhatsApp. En PC abre **WhatsApp Web** (`web.whatsapp.com/send`) con ese número y el mensaje preparado; requiere una sesión vinculada. También se descarga el PNG. No hace falta guardar el contacto ni buscarlo manualmente. La persona debe **adjuntar la imagen descargada y confirmar el envío**. Los enlaces de chat no adjuntan archivos automáticamente.
+- La misma selección entre WhatsApp Web en PC y WhatsApp en celular se aplica al aviso de retiro.
+- El chat se abre durante el clic, antes de iniciar la descarga. Si el navegador bloquea la pestaña, se puede usar **Abrir chat de [cliente]**; **Descargar imagen** permite recuperar el archivo por separado.
+- No se usa el menú de compartir del sistema, porque no permite preseleccionar el destinatario. Abrir el chat no registra el mensaje como enviado.
 - La generación ocurre en el navegador, sin subir la boleta o sus datos a servicios de imágenes. El generador se carga cuando se abre la boleta y reduce la resolución para documentos muy extensos. La vista es una instantánea del pedido confirmado; los refrescos no cambian una boleta abierta.
 
 El mensaje que acompaña esta imagen dice “Te envío tu orden de trabajo”; no usa el aviso “Tu prenda ya está lista para retirar” porque el trabajo recién se creó. El aviso de retiro existente se conserva.
