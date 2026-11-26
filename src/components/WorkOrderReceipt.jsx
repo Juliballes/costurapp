@@ -151,22 +151,17 @@ function Receipt({ boleta, onClose }) {
         setCompartiendo(true);
         setAvisoCompartir("");
         try {
-            const resultado = await compartirImagenBoleta({
+            await compartirImagenBoleta({
                 blob: imagen.blob,
                 nombre: archivo,
-                mensaje,
                 enlace,
             });
             setAvisoCompartir(
-                resultado === "compartido"
-                    ? `Elegí a ${modelo.nombre} en WhatsApp y comprobá el envío de la imagen.`
-                    : "Imagen descargada. En el chat que se abrió, adjuntá la imagen descargada y confirmá el envío.",
+                `Imagen descargada. Adjuntala en el chat de ${modelo.nombre} y confirmá el envío. Si el chat no se abrió, usá el enlace de abajo.`,
             );
-        } catch (e) {
+        } catch {
             setAvisoCompartir(
-                e.name === "AbortError"
-                    ? "Compartir cancelado. La imagen sigue lista para enviar."
-                    : "No pudimos abrir el envío. Descargá la imagen y abrí el chat para adjuntarla.",
+                "No pudimos completar la apertura del envío. Usá Descargar imagen y el enlace al chat para adjuntarla.",
             );
         } finally {
             envioEnCurso.current = false;
@@ -274,7 +269,10 @@ function Receipt({ boleta, onClose }) {
             <div className="receipt-send-help">
                 <p>
                     <strong>Para: {modelo.nombre}</strong> · {modelo.telefono}.
-                    Elegí este contacto en WhatsApp y confirmá el envío.
+                    Al enviar se abre el chat de este número con el mensaje
+                    preparado: WhatsApp Web en la PC o WhatsApp en el celular.
+                    Se descarga la boleta para que la adjuntes en ese chat y
+                    confirmes el envío.
                 </p>
                 {!enlace && (
                     <p className="receipt-error">
@@ -282,12 +280,12 @@ function Receipt({ boleta, onClose }) {
                         Editar pedido para abrir su chat.
                     </p>
                 )}
+                {avisoCompartir && <p role="status">{avisoCompartir}</p>}
                 {enlace && (
                     <a href={enlace} target="_blank" rel="noreferrer">
                         Abrir chat de {modelo.nombre}
                     </a>
                 )}
-                {avisoCompartir && <p role="status">{avisoCompartir}</p>}
                 {errorImagen && (
                     <p className="receipt-error" role="alert">
                         {errorImagen}
